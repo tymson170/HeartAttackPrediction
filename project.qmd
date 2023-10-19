@@ -4,3 +4,57 @@ author: "Tymoteusz Romanowicz, Patryk Tokarski"
 format: html
 editor: visual
 ---
+
+```{r}
+df <- read.csv("Data/Medicaldataset.csv")
+head(df)
+```
+
+```{r}
+names(df)
+summary(df)
+```
+
+```{r}
+df$Result <- as.factor(df$Result)
+summary(df)
+```
+
+```{r}
+library(corrplot)
+library(knitr)
+library(PerformanceAnalytics)
+kable(cor(df[, -9]))
+chart.Correlation(df[, -9])
+```
+
+```{r}
+df$Result <- ifelse(df$Result == "positive", 1, 0)
+head(df)
+```
+
+```{r}
+df <- df[df$Heart.rate != 1111, ]
+head(df)
+```
+
+```{r}
+chart.Correlation(df)
+```
+
+```{r}
+tail(df[df$CK.MB>=300, ])
+```
+
+```{r}
+model <- glm(Result~., family = 'binomial', data = df[, -c(3:5)])
+summary(model)
+```
+
+```{r}
+probs <- predict(model, newdata = df[, -c(3:5)], type = "response")
+pred <- rep(0, length(probs))
+pred[probs > .5] <- 1
+
+table(pred, df$Result)
+```
