@@ -1,4 +1,4 @@
-# Prediction
+# Heart Attact
 
 1.  Przedstawienie zbioru danych
 
