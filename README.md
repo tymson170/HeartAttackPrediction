@@ -1,4 +1,4 @@
-# StrokePrediction
+# Prediction
 
 1.  Przedstawienie zbioru danych
 
@@ -10,7 +10,7 @@
 
 2.  Cele badawcze - sprawdzenie, jakie czynniki mają wpływ na wystąpienie udaru u człowieka
 
-3.  Przygotowanie zbioru / weryfikacja poprawnosci danych / brakujace wartosci  - caly kod którym porządkujemy dane, zmieniamy wartosci na factor, może dzielimy wiek na sekcje (18-25, 26-50)
+3.  Przygotowanie zbioru / weryfikacja poprawnosci danych / brakujace wartosci - caly kod którym porządkujemy dane, zmieniamy wartosci na factor, może dzielimy wiek na sekcje (18-25, 26-50)
 
 4.  Opis zbioru / statystyczna analiza opisowa - summary, statystyki opisowe,
 
