@@ -3,43 +3,85 @@ title: "Heart Attact"
 author: "Tymoteusz Romanowicz, Patryk Tokarski"
 format: html
 editor: visual
+embed-resources: true
 ---
 
+Opis: Finding a good data source is the first step toward creating a database. Cardiovascular illnesses (CVDs) are the major cause of death worldwide. CVDs include coronary heart disease, cerebrovascular disease, rheumatic heart disease, and other heart and blood vessel problems. According to the World Health Organization, 17.9 million people die each year. Heart attacks and strokes account for more than four out of every five CVD deaths, with one-third of these deaths occurring before the age of 70. A comprehensive database for factors that contribute to a heart attack has been constructed. The main purpose here is to collect characteristics of Heart Attack or factors that contribute to it. The size of the dataset is 1319 samples, which have nine fields, where eight fields are for input fields and one field for an output field. Age, gender, heart rate (impulse), systolic BP (pressurehight), diastolic BP (pressurelow), blood sugar(glucose), CK-MB (kcm), and Test-Troponin (troponin) are representing the input fields, while the output field pertains to the presence of heart attack (class), which is divided into two categories (negative and positive); negative refers to the absence of a heart attack, while positive refers to the presence of a heart attack.
+
+Pierwsze 6 wierszy:
+
 ```{r}
-df <- read.csv("Data/Medicaldataset.csv")
+library(tidyverse)
+library(foreign)
+
+df <- read.arff("data/Medicaldataset.arff")
+df <- df %>% rename(
+  "Age" = age,
+  "Gender" = gender,
+  "Heart Rate" = impluse,
+  "Systolic.blood.pressure" = pressurehight,
+  "Diastolic.blood.pressure" = pressurelow,
+  "Blood.sugar" = glucose,
+  "CK.MB" = kcm,
+  "Troponin" = troponin,
+  "Result" = class
+)
+```
+
+| Cecha                    | Opis                                                                                                 |
+|--------------------------|------------------------------------------------------------------------------------------------------|
+| Age                      | Wiek pacjenta w latach                                                                               |
+| Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                           |
+| Heart Rate               | Maksymalne osiągnięte tętno (od 10 do 160)                                                           |
+| Systolic blood pressure  | Spoczynkowe skurczowe ciśnienie krwi (w mm Hg, podczas dojazdu do szpitala) (70-190)                 |
+| Diastolic blood pressure | Spoczynkowe rozkurczowe ciśnienie krwi (w mm Hg, podczas dojazdu do szpitala) (40-100)               |
+| Blood sugar              | Poziom cukru we krwi (1-900mg/dl) #TODO na wiki jest że do ponad 200 poziom                          |
+| CK-MB                    | Enzym CK-MB (mężczyźni do 6,22, kobiety do 4,88). Jest to enzym kinazy kreatynowej.                  |
+| Troponin                 | Enzym troponiny (0,0 - 0,014) #TODO wartosc graniczna (odkad mozna podejrzewa chorobe serca) od 0,03 |
+
+: Cechy i ich opisy
+
+```{r}
 head(df)
+
 ```
 
 ```{r}
-names(df)
-summary(df)
-```
-
-```{r}
+# przedstawienie result jako zmiennej jakościowej
 df$Result <- as.factor(df$Result)
+df$Gender <- as.factor(df$Gender)
 summary(df)
+```
+
+Wykrycie obserwacji odstających:
+
+```{r}
+library(rstatix)
+names(df)
+zmienne <- c("Age", "Diastolic.blood.pressure")
+identify_outliers(df["Troponin"])
+
 ```
 
 ```{r}
 library(corrplot)
 library(knitr)
 library(PerformanceAnalytics)
-kable(cor(df[, -9]))
-chart.Correlation(df[, -9])
+
+chart.Correlation(df[,c(1,3:8)])
+corrplot(cor(df[,c(1,3:8)]))
 ```
 
 ```{r}
 df$Result <- ifelse(df$Result == "positive", 1, 0)
-head(df)
+head(df) 
 ```
 
-```{r}
-df <- df[df$Heart.rate != 1111, ]
-head(df)
-```
+#TODO Przeniesc Czyszczenie
 
 ```{r}
-chart.Correlation(df)
+df <- df[df$`Heart Rate` != 1111, ]
+head(df)
 ```
 
 ```{r}
