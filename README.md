@@ -1,5 +1,15 @@
 # Heart Attact
 
+# todo
+
+-   przerobić opis z początku i umieścić go w odpowiednim miejscu
+
+-   ustalić normalne i chorobowe zakresy wartości dla cech i przerobić odpowiednio tabelke
+
+-   na podstawie tabelki przeczyscic odpowiednio zbiór danych
+
+-   umieścić 2 modele - sieć neuronowa + prosty glm i porównać wyniki
+
 1.  Przedstawienie zbioru danych
 
     1.  Źródło danych
