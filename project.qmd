@@ -17,7 +17,7 @@ Opis: Finding a good data source is the first step toward creating a database. C
         2.  Przedstawienie zmiennych: opis jakie są i co znaczą\
 
             | Cecha                    | Opis                                                                                                 |
-            |------------------|------------------------------------------------------|
+            |--------------------|----------------------------------------------------|
             | Age                      | Wiek pacjenta w latach                                                                               |
             | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                           |
             | Heart Rate               | Maksymalne osiągnięte tętno (od 10 do 160)                                                           |
@@ -128,27 +128,31 @@ tail(df[df$CK.MB>=300, ])
 ```
 
 ```{r}
-df[c(-1,-2,-9)] <- df[c(-1,-2,-9)] %>% scale()
-model <- glm(Result~.-Blood.Sugar, family = 'binomial', data = df[, -c(3:5)])
-summary(model)
-```
+sample <- sample(c(TRUE, FALSE), nrow(df), replace=TRUE, prob=c(0.7,0.3))
+test   <- df[!sample, ]
+df  <- df[sample, ]
 
-```{r}
-probs <- predict(model, newdata = df[, -c(3:5)], type = "response")
+
+model <- glm(Result~log(CK.MB)+log(Troponin), family = 'binomial', data = df)
+
+summary(model)
+
+probs <- predict(model, newdata = test, type = "response")
 pred <- rep(0, length(probs))
 pred[probs > .5] <- 1
-
-table(pred, df$Result)
+table(pred, test$Result)
 ```
 
 Dalex - paczka do wyjasniania modelu
 
 ```{r}
 library(DALEX)
-explainer <- explain(model, data = df[-9], y = df[9])
+explainer <- explain(model, data = test[-9], y = test[9])
+explainer %>% model_performance()
+
 explainer %>% feature_importance() %>% plot()
 explainer %>% model_performance()  %>% plot()
-explainer %>% model_performance()
+
 ```
 
 install.packages("devtools")
@@ -157,10 +161,4 @@ devtools::install_github("ModelOriented/ArenaR")
 
 install.packages("arenar")
 
-```{r}
-library(arenar)
-heart_attack_ar <- create_arena(live = TRUE) %>% 
-  push_model(explainer) %>% 
-  push_observations(df)
-run_server(heart_attack_ar)
-```
+library(arenar) heart_attack_ar \<- create_arena(live = TRUE) %\>% push_model(explainer) %\>% push_observations(test) run_server(heart_attack_ar)
