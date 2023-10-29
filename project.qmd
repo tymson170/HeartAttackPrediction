@@ -13,11 +13,13 @@ Opis: Finding a good data source is the first step toward creating a database. C
     1.  Źródło danych
 
         1.  Zawartość zbioru: informacja o ilości danych, kiedy zostały zebrane\
+            Zbiór danych zawiera 1319 obserwacji i 9 cech, z czego jedna odnosi się do obecności ataku serca.\
+            Zawał mięśnia sercowego, potocznie zwany atakiem serca to martwica mięśnia sercowego spowodowana jego niedokrwieniem wskutek zamknięcia tętnicy wieńcowej doprowadzającej krew do serca.[TODO cytat](https://web.archive.org/web/20150224034615/http://www.nhlbi.nih.gov/health/health-topics/topics/cad/signs)
 
         2.  Przedstawienie zmiennych: opis jakie są i co znaczą\
 
             | Cecha                    | Opis                                                                                                 |
-            |--------------------|----------------------------------------------------|
+            |---------------------|---------------------------------------------------|
             | Age                      | Wiek pacjenta w latach                                                                               |
             | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                           |
             | Heart Rate               | Maksymalne osiągnięte tętno (od 10 do 160)                                                           |
