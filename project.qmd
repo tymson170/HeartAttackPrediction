@@ -18,21 +18,21 @@ Opis: Finding a good data source is the first step toward creating a database. C
 
         2.  Przedstawienie zmiennych: opis jakie są i co znaczą\
 
-            | Cecha                    | Opis                                                                                                 |
-            |--------------------------|------------------------------------------------------------------------------------------------------|
-            | Age                      | Wiek pacjenta w latach                                                                               |
-            | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                           |
-            | Heart Rate               | Maksymalne osiągnięte tętno (od 10 do 160)                                                           |
-            | Systolic blood pressure  | Spoczynkowe skurczowe ciśnienie krwi (w mm Hg, podczas dojazdu do szpitala) (70-190)                 |
-            | Diastolic blood pressure | Spoczynkowe rozkurczowe ciśnienie krwi (w mm Hg, podczas dojazdu do szpitala) (40-100)               |
-            | Blood sugar              | Poziom cukru we krwi (1-900mg/dl) #TODO na wiki jest że do ponad 200 poziom                          |
-            | CK-MB                    | Enzym CK-MB (mężczyźni do 6,22, kobiety do 4,88). Jest to enzym kinazy kreatynowej.                  |
-            | Troponin                 | Enzym troponiny (0,0 - 0,014) #TODO wartosc graniczna (odkad mozna podejrzewa chorobe serca) od 0,03 |
+            | Cecha                    | Opis                                                                                                           |
+            |-----------------|-------------------------------------------------------|
+            | Age                      | Wiek pacjenta w latach                                                                                         |
+            | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
+            | Heart Rate               | Maksymalne osiągnięte tętno                                                                                    |
+            | Systolic blood pressure  | Spoczynkowe skurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości 90-120 mmHg)     |
+            | Diastolic blood pressure | Spoczynkowe rozkurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości od 60-80 mmHg) |
+            | Blood sugar              | Poziom cukru we krwi (nonalne wartości do 140mg/dl)                                                            |
+            | CK-MB                    | Enzym CK-MB (mężczyźni do 7,8 ng/mL, kobiety do 4,4 ng/mL). Jest to enzym kinazy kreatynowej.                  |
+            | Troponin                 | Enzym troponiny (wartości normalne do 0,03 mikrogramów)                                                        |
+            | Result                   | Obecność zawału                                                                                                |
 
-            : Cechy i ich opisy
+            : Cechy i ich opisy\
 
 2.  Cele badawcze - sprawdzenie, jakie czynniki mają wpływ na wystąpienie udaru u człowieka\
-    \
     \
 
 3.  Przygotowanie zbioru / weryfikacja poprawnosci danych / brakujace wartosci - caly kod którym porządkujemy dane, zmieniamy wartosci na factor, może dzielimy wiek na sekcje (18-25, 26-50)\
@@ -60,8 +60,8 @@ Opis: Finding a good data source is the first step toward creating a database. C
     ```
 
     ```{r}
-    #df %>%
-    #  summarise() TODO jakas ladna tabelka?
+    df %>%
+      summary()
     ```
 
 5.  Wizualizacja - ...\
