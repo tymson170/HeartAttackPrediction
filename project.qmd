@@ -4,6 +4,10 @@ author: "Tymoteusz Romanowicz, Patryk Tokarski"
 format: html
 editor: visual
 embed-resources: true
+execute: 
+  warning: false
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ## Źródło danych
@@ -21,7 +25,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|-------------------|-----------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno                                                                                    |
@@ -45,12 +49,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ## Przygotowanie zbioru / weryfikacja poprawnosci danych / brakujace wartosci
 
 caly kod którym porządkujemy dane, zmieniamy wartosci na factor, może dzielimy wiek na sekcje (18-25, 26-50)
-
-## Opis zbioru
-
-/ statystyczna analiza opisowa - summary, statystyki opisowe
-
-```{{r}}
+```{r}
 library(tidyverse)
 library(foreign)
 
@@ -69,9 +68,50 @@ df <- df %>% rename(
 ```
 
 ```{r}
-df %>%
-  summary()
+df <- df[df$`Heart Rate` != 1111, ]
+
+df$Result <- ifelse(df$Result == "positive", "Positive", "Negative")
+df$Gender <- ifelse(df$Gender == 1, "Male", "Female")
+
+df$Gender <- as.factor(df$Gender)
+df$Result <- as.factor(df$Result)
 ```
+
+
+## Opis zbioru
+
+/ statystyczna analiza opisowa - summary, statystyki opisowe
+
+
+
+```{r}
+library(pander)
+pander(summary(df))
+```
+
+```{r}
+library(rstatix)
+df %>% get_summary_stats(show = c("min", "median", "mean", "max"))
+```
+
+Widoczna lewa asymetria histogramu wieku.
+```{r}
+library(ggpubr)
+df %>% gghistogram(x="Age", fill="Result")
+```
+
+#TODO można sprawdzić test na równość średnich dla wieku obu płci
+```{r}
+df %>% ggplot(aes(y=Age,fill=Gender))+
+  geom_boxplot()
+```
+
+#TODO test na równość tego czy procent pozytywnych przypadków jest równy ze względu na płeć.
+```{r}
+df %>% group_by(Gender) %>% 
+  summarise(n=n(), "Percent of Positive"=round(sum(Result=="Positive")/n(),2))
+```
+
 
 ## Wizualizacja
 
@@ -100,13 +140,6 @@ head(df)
 
 ```
 
-```{r}
-# przedstawienie result jako zmiennej jakościowej
-df$Result <- as.factor(df$Result)
-df$Gender <- as.factor(df$Gender)
-summary(df)
-```
-
 Wykrycie obserwacji odstających:
 
 ```{r}
@@ -126,17 +159,8 @@ chart.Correlation(df[,c(1,3:8)])
 corrplot(cor(df[,c(1,3:8)]))
 ```
 
-```{r}
-df$Result <- ifelse(df$Result == "positive", 1, 0)
-head(df) 
-```
 
 #TODO Przeniesc Czyszczenie
-
-```{r}
-df <- df[df$`Heart Rate` != 1111, ]
-head(df)
-```
 
 ```{r}
 tail(df[df$CK.MB>=300, ])
@@ -162,11 +186,11 @@ Dalex - paczka do wyjasniania modelu
 
 ```{r}
 library(DALEX)
-explainer <- explain(model, data = test[-9], y = test[9])
-explainer %>% model_performance()
+#explainer <- explain(model, data = test[-9], y = test[9])
+#explainer %>% model_performance()
 
-explainer %>% feature_importance() %>% plot()
-explainer %>% model_performance()  %>% plot()
+#explainer %>% feature_importance() %>% plot()
+#explainer %>% model_performance()  %>% plot()
 
 ```
 
