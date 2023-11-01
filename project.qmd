@@ -20,21 +20,19 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
-```         
-    | Cecha                    | Opis                                                                                                           |
-    |-------------------|-----------------------------------------------------|
-    | Age                      | Wiek pacjenta w latach                                                                                         |
-    | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
-    | Heart Rate               | Maksymalne osiągnięte tętno                                                                                    |
-    | Systolic blood pressure  | Spoczynkowe skurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości 90-120 mmHg)     |
-    | Diastolic blood pressure | Spoczynkowe rozkurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości od 60-80 mmHg) |
-    | Blood sugar              | Poziom cukru we krwi (nonalne wartości do 140mg/dl)                                                            |
-    | CK-MB                    | Enzym CK-MB (mężczyźni do 7,8 ng/mL, kobiety do 4,4 ng/mL). Jest to enzym kinazy kreatynowej.                  |
-    | Troponin                 | Enzym troponiny (wartości normalne do 0,03 mikrogramów)                                                        |
-    | Result                   | Obecność zawału                                                                                                |
+| Cecha                    | Opis                                                                                                           |
+|-------------------|-----------------------------------------------------|
+| Age                      | Wiek pacjenta w latach                                                                                         |
+| Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
+| Heart Rate               | Maksymalne osiągnięte tętno                                                                                    |
+| Systolic blood pressure  | Spoczynkowe skurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości 90-120 mmHg)     |
+| Diastolic blood pressure | Spoczynkowe rozkurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości od 60-80 mmHg) |
+| Blood sugar              | Poziom cukru we krwi (nonalne wartości do 140mg/dl)                                                            |
+| CK-MB                    | Enzym CK-MB (mężczyźni do 7,8 ng/mL, kobiety do 4,4 ng/mL). Jest to enzym kinazy kreatynowej.                  |
+| Troponin                 | Enzym troponiny (wartości normalne do 0,03 mikrogramów)                                                        |
+| Result                   | Obecność zawału                                                                                                |
 
-    : Cechy i ich opisy\
-```
+: Cechy i ich opisy
 
 ## Cele badawcze
 
