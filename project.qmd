@@ -6,87 +6,94 @@ editor: visual
 embed-resources: true
 ---
 
-Opis: Finding a good data source is the first step toward creating a database. Cardiovascular illnesses (CVDs) are the major cause of death worldwide. CVDs include coronary heart disease, cerebrovascular disease, rheumatic heart disease, and other heart and blood vessel problems. According to the World Health Organization, 17.9 million people die each year. Heart attacks and strokes account for more than four out of every five CVD deaths, with one-third of these deaths occurring before the age of 70. A comprehensive database for factors that contribute to a heart attack has been constructed. The main purpose here is to collect characteristics of Heart Attack or factors that contribute to it. The size of the dataset is 1319 samples, which have nine fields, where eight fields are for input fields and one field for an output field. Age, gender, heart rate (impulse), systolic BP (pressurehight), diastolic BP (pressurelow), blood sugar(glucose), CK-MB (kcm), and Test-Troponin (troponin) are representing the input fields, while the output field pertains to the presence of heart attack (class), which is divided into two categories (negative and positive); negative refers to the absence of a heart attack, while positive refers to the presence of a heart attack.
+## Źródło danych
 
-1.  Przedstawienie zbioru danych
+### Zawartość zbioru:
 
-    1.  Źródło danych
+Dane do zbioru były zbierane podczas transportu karetką do szpitala pacjentów, którzy podejrzewali u siebie obecność zawału serca. Zawał mięśnia sercowego, potocznie zwany atakiem serca to martwica mięśnia sercowego spowodowana jego niedokrwieniem wskutek zamknięcia tętnicy wieńcowej doprowadzającej krew do serca.[^1] W europie choroby układu krążenia są najczęstszą przyczyną zgonów. Z powodu schorzeń sercowo-naczyniowych w tym zawału mięśnia sercowego, umiera dwa razy więcej osób niż z powodu chorób nowotworowych.[^2] Zbiór danych zawiera 1319 obserwacji i 9 cech, z czego jedna odnosi się do obecności ataku serca.
 
-        1.  Zawartość zbioru: informacja o ilości danych, kiedy zostały zebrane\
-            Zbiór danych zawiera 1319 obserwacji i 9 cech, z czego jedna odnosi się do obecności ataku serca.\
-            Zawał mięśnia sercowego, potocznie zwany atakiem serca to martwica mięśnia sercowego spowodowana jego niedokrwieniem wskutek zamknięcia tętnicy wieńcowej doprowadzającej krew do serca.[TODO cytat](https://web.archive.org/web/20150224034615/http://www.nhlbi.nih.gov/health/health-topics/topics/cad/signs)
+[^1]: <https://web.archive.org/web/20150224034615/http://www.nhlbi.nih.gov/health/health-topics/topics/cad/signs>
 
-        2.  Przedstawienie zmiennych: opis jakie są i co znaczą\
+[^2]: <https://ec.europa.eu/eurostat/web/products-statistics-in-focus/-/ks-nk-06-010>
 
-            | Cecha                    | Opis                                                                                                           |
-            |------------------|------------------------------------------------------|
-            | Age                      | Wiek pacjenta w latach                                                                                         |
-            | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
-            | Heart Rate               | Maksymalne osiągnięte tętno                                                                                    |
-            | Systolic blood pressure  | Spoczynkowe skurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości 90-120 mmHg)     |
-            | Diastolic blood pressure | Spoczynkowe rozkurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości od 60-80 mmHg) |
-            | Blood sugar              | Poziom cukru we krwi (nonalne wartości do 140mg/dl)                                                            |
-            | CK-MB                    | Enzym CK-MB (mężczyźni do 7,8 ng/mL, kobiety do 4,4 ng/mL). Jest to enzym kinazy kreatynowej.                  |
-            | Troponin                 | Enzym troponiny (wartości normalne do 0,03 mikrogramów)                                                        |
-            | Result                   | Obecność zawału                                                                                                |
+Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tętnicze, poziom cukru we krwi, CK-MB (kineaza kreatynowa) i troponina reprezentują pola wejściowe, podczas gdy pole wyjściowe odnosi się do obecności zawału serca, który jest podzielone na dwie kategorie (0 i 1); "0" odnosi się do braku zawału serca, podczas gdy "1" odnosi się do obecności zawału serca.
 
-            : Cechy i ich opisy\
+### Przedstawienie zmiennych: opis jakie są i co znaczą
 
-2.  Cele badawcze\
-    - Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie (wiek, płeć, tętno, ciśnienie krwi, poziom cukru we krwi, CK-MB, troponina), przewiduje czy miał zawał serca.\
-    - Dokonanie segmentacji pacjentów, aby zidentyfikować grupy pacjentów o podobnym ryzyku wystąpienia zawału serca.\
-    - Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
+```         
+    | Cecha                    | Opis                                                                                                           |
+    |-------------------|-----------------------------------------------------|
+    | Age                      | Wiek pacjenta w latach                                                                                         |
+    | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
+    | Heart Rate               | Maksymalne osiągnięte tętno                                                                                    |
+    | Systolic blood pressure  | Spoczynkowe skurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości 90-120 mmHg)     |
+    | Diastolic blood pressure | Spoczynkowe rozkurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości od 60-80 mmHg) |
+    | Blood sugar              | Poziom cukru we krwi (nonalne wartości do 140mg/dl)                                                            |
+    | CK-MB                    | Enzym CK-MB (mężczyźni do 7,8 ng/mL, kobiety do 4,4 ng/mL). Jest to enzym kinazy kreatynowej.                  |
+    | Troponin                 | Enzym troponiny (wartości normalne do 0,03 mikrogramów)                                                        |
+    | Result                   | Obecność zawału                                                                                                |
 
-3.  Przygotowanie zbioru / weryfikacja poprawnosci danych / brakujace wartosci - caly kod którym porządkujemy dane, zmieniamy wartosci na factor, może dzielimy wiek na sekcje (18-25, 26-50)\
-    \
+    : Cechy i ich opisy\
+```
 
-4.  Opis zbioru / statystyczna analiza opisowa - summary, statystyki opisowe\
-    \
+## Cele badawcze
 
-    ```{r}
-    library(tidyverse)
-    library(foreign)
+-   Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie (wiek, płeć, tętno, ciśnienie krwi, poziom cukru we krwi, CK-MB, troponina), przewiduje czy miał zawał serca.
 
-    df <- read.arff("data/Medicaldataset.arff")
-    df <- df %>% rename(
-      "Age" = age,
-      "Gender" = gender,
-      "Heart Rate" = impluse,
-      "Systolic.blood.pressure" = pressurehight,
-      "Diastolic.blood.pressure" = pressurelow,
-      "Blood.sugar" = glucose,
-      "CK.MB" = kcm,
-      "Troponin" = troponin,
-      "Result" = class
-    )
-    ```
+-   Dokonanie segmentacji pacjentów, aby zidentyfikować grupy pacjentów o podobnym ryzyku wystąpienia zawału serca.
 
-    ```{r}
-    df %>%
-      summary()
-    ```
+-   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
-5.  Wizualizacja - ...\
-    \
+## Przygotowanie zbioru / weryfikacja poprawnosci danych / brakujace wartosci
 
-6.  Analiza korespondencji - *sprawdzic czy nam to potrzebne* <https://www.statsoft.pl/textbook/stathome_stat.html?https%3A%2F%2Fwww.statsoft.pl%2Ftextbook%2Fstcoran.html>\
-    \
+caly kod którym porządkujemy dane, zmieniamy wartosci na factor, może dzielimy wiek na sekcje (18-25, 26-50)
 
-7.  Model
+## Opis zbioru
 
-    1.  Wybór modelu - wypisac ktory moze byc najlepszy
+/ statystyczna analiza opisowa - summary, statystyki opisowe
 
-    2.  stworzenie modelu
+```{{r}}
+library(tidyverse)
+library(foreign)
 
-    3.  przetrenowanie modelu
+df <- read.arff("data/Medicaldataset.arff")
+df <- df %>% rename(
+  "Age" = age,
+  "Gender" = gender,
+  "Heart Rate" = impluse,
+  "Systolic.blood.pressure" = pressurehight,
+  "Diastolic.blood.pressure" = pressurelow,
+  "Blood.sugar" = glucose,
+  "CK.MB" = kcm,
+  "Troponin" = troponin,
+  "Result" = class
+)
+```
 
-    4.  testowanie modelu
+```{r}
+df %>%
+  summary()
+```
 
-    5.  Podsumowanie efektywności modelu / jego przydatności\
-        \
+## Wizualizacja
 
-8.  Odpowiedź na pytania badawcze i podsumowanie\
-    \
+## Analiza korespondencji
+
+sprawdzic czy nam to potrzebne <https://www.statsoft.pl/textbook/stathome_stat.html?https%3A%2F%2Fwww.statsoft.pl%2Ftextbook%2Fstcoran.html>
+
+## Model
+
+### Wybór modelu - wypisac ktory moze byc najlepszy
+
+### stworzenie modelu
+
+### trening modelu
+
+### testowanie modelu
+
+### Podsumowanie efektywności modelu / jego przydatności
+
+## Odpowiedź na pytania badawcze i podsumowanie
 
 Pierwsze 6 wierszy:
 
