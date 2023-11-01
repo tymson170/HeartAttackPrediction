@@ -106,6 +106,10 @@ df %>% ggplot(aes(y=Age,fill=Gender))+
   geom_boxplot()
 ```
 
+```{r}
+df %>% ggplot(aes(y=Diastolic.blood.pressure, fill=Result))+
+  geom_boxplot()
+```
 #TODO test na równość tego czy procent pozytywnych przypadków jest równy ze względu na płeć.
 ```{r}
 df %>% group_by(Gender) %>% 
