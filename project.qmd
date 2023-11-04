@@ -212,14 +212,6 @@ library(Hmisc)
 hist.data.frame(df)
 ```
 
-### Wizualizacja zmiennych
-
-```{r}
-df$Gender <- as.numeric(df$Gender)
-library(Hmisc)
-hist.data.frame(df)
-```
-
 ```{r}
 tail(df[df$CK.MB>=300, ])
 ```
