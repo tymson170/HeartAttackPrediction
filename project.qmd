@@ -4,68 +4,65 @@ author: "Tymoteusz Romanowicz, Patryk Tokarski"
 format: html
 editor: visual
 embed-resources: true
+execute: 
+  warning: false
+editor_options: 
+  chunk_output_type: inline
 ---
 
-Opis: Finding a good data source is the first step toward creating a database. Cardiovascular illnesses (CVDs) are the major cause of death worldwide. CVDs include coronary heart disease, cerebrovascular disease, rheumatic heart disease, and other heart and blood vessel problems. According to the World Health Organization, 17.9 million people die each year. Heart attacks and strokes account for more than four out of every five CVD deaths, with one-third of these deaths occurring before the age of 70. A comprehensive database for factors that contribute to a heart attack has been constructed. The main purpose here is to collect characteristics of Heart Attack or factors that contribute to it. The size of the dataset is 1319 samples, which have nine fields, where eight fields are for input fields and one field for an output field. Age, gender, heart rate (impulse), systolic BP (pressurehight), diastolic BP (pressurelow), blood sugar(glucose), CK-MB (kcm), and Test-Troponin (troponin) are representing the input fields, while the output field pertains to the presence of heart attack (class), which is divided into two categories (negative and positive); negative refers to the absence of a heart attack, while positive refers to the presence of a heart attack.
+## Źródło danych
 
-1.  Przedstawienie zbioru danych
+### Zawartość zbioru:
 
-    1.  Źródło danych
+Dane do zbioru były zbierane podczas transportu karetką do szpitala pacjentów, którzy podejrzewali u siebie obecność zawału serca. Zawał mięśnia sercowego, potocznie zwany atakiem serca to martwica mięśnia sercowego spowodowana jego niedokrwieniem wskutek zamknięcia tętnicy wieńcowej doprowadzającej krew do serca.[^1] W europie choroby układu krążenia są najczęstszą przyczyną zgonów. Z powodu schorzeń sercowo-naczyniowych w tym zawału mięśnia sercowego, umiera dwa razy więcej osób niż z powodu chorób nowotworowych.[^2] Zbiór danych zawiera 1319 obserwacji i 9 cech, z czego jedna odnosi się do obecności ataku serca.
 
-        1.  Zawartość zbioru: informacja o ilości danych, kiedy zostały zebrane\
+[^1]: <https://web.archive.org/web/20150224034615/http://www.nhlbi.nih.gov/health/health-topics/topics/cad/signs>
 
-        2.  Przedstawienie zmiennych: opis jakie są i co znaczą\
+[^2]: <https://ec.europa.eu/eurostat/web/products-statistics-in-focus/-/ks-nk-06-010>
 
-            | Cecha                    | Opis                                                                                                 |
-            |--------------------------|------------------------------------------------------------------------------------------------------|
-            | Age                      | Wiek pacjenta w latach                                                                               |
-            | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                           |
-            | Heart Rate               | Maksymalne osiągnięte tętno (od 10 do 160)                                                           |
-            | Systolic blood pressure  | Spoczynkowe skurczowe ciśnienie krwi (w mm Hg, podczas dojazdu do szpitala) (70-190)                 |
-            | Diastolic blood pressure | Spoczynkowe rozkurczowe ciśnienie krwi (w mm Hg, podczas dojazdu do szpitala) (40-100)               |
-            | Blood sugar              | Poziom cukru we krwi (1-900mg/dl) #TODO na wiki jest że do ponad 200 poziom                          |
-            | CK-MB                    | Enzym CK-MB (mężczyźni do 6,22, kobiety do 4,88). Jest to enzym kinazy kreatynowej.                  |
-            | Troponin                 | Enzym troponiny (0,0 - 0,014) #TODO wartosc graniczna (odkad mozna podejrzewa chorobe serca) od 0,03 |
+Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tętnicze, poziom cukru we krwi, CK-MB (kineaza kreatynowa) i troponina reprezentują pola wejściowe, podczas gdy pole wyjściowe odnosi się do obecności zawału serca, który jest podzielone na dwie kategorie (0 i 1); "0" odnosi się do braku zawału serca, podczas gdy "1" odnosi się do obecności zawału serca.
 
-            : Cechy i ich opisy
+### Przedstawienie zmiennych: opis jakie są i co znaczą
 
-2.  Cele badawcze - sprawdzenie, jakie czynniki mają wpływ na wystąpienie udaru u człowieka\
-    \
++--------------------------+----------------------------------------------------------------------------------------------------------------+
+| Cecha                    | Opis                                                                                                           |
++==========================+================================================================================================================+
+| Age                      | Wiek pacjenta w latach                                                                                         |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
+| Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
+| Heart Rate               | Maksymalne osiągnięte tętno                                                                                    |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
+| Systolic blood pressure  | Spoczynkowe skurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości 90-120 mmHg)     |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
+| Diastolic blood pressure | Spoczynkowe rozkurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości od 60-80 mmHg) |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
+| Blood sugar              | Poziom cukru we krwi (nonalne wartości do 140mg/dl)                                                            |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
+| CK-MB                    | Enzym CK-MB (mężczyźni do 7,8 ng/mL, kobiety do 4,4 ng/mL). Jest to enzym kinazy kreatynowej.                  |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
+| Troponin                 | Enzym troponiny (wartości normalne do 0,03 mikrogramów)                                                        |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
+| Result                   | Obecność zawału                                                                                                |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
 
-3.  Przygotowanie zbioru / weryfikacja poprawnosci danych / brakujace wartosci - caly kod którym porządkujemy dane, zmieniamy wartosci na factor, może dzielimy wiek na sekcje (18-25, 26-50)\
-    \
+: Cechy i ich opisy
 
-4.  Opis zbioru / statystyczna analiza opisowa - summary, statystyki opisowe\
-    \
+## Cele badawcze
 
-5.  Wizualizacja - ...\
-    \
+-   Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie (wiek, płeć, tętno, ciśnienie krwi, poziom cukru we krwi, CK-MB, troponina), przewiduje czy miał zawał serca.
 
-6.  Analiza korespondencji - *sprawdzic czy nam to potrzebne* <https://www.statsoft.pl/textbook/stathome_stat.html?https%3A%2F%2Fwww.statsoft.pl%2Ftextbook%2Fstcoran.html>\
-    \
+-   Dokonanie segmentacji pacjentów, aby zidentyfikować grupy pacjentów o podobnym ryzyku wystąpienia zawału serca.
 
-7.  Model
+-   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
-    1.  Wybór modelu - wypisac ktory moze byc najlepszy
-
-    2.  stworzenie modelu
-
-    3.  przetrenowanie modelu
-
-    4.  testowanie modelu
-
-    5.  Podsumowanie efektywności modelu / jego przydatności\
-        \
-
-8.  Odpowiedź na pytania badawcze i podsumowanie\
-    \
-
-Pierwsze 6 wierszy:
+## Przygotowanie zbioru / weryfikacja poprawnosci danych / brakujace wartosci
 
 ```{r}
 library(tidyverse)
 library(foreign)
 
+# wczytanie zbioru
 df <- read.arff("data/Medicaldataset.arff")
 df <- df %>% rename(
   "Age" = age,
@@ -81,16 +78,111 @@ df <- df %>% rename(
 ```
 
 ```{r}
-head(df)
+#czyszczenie zbioru, zamiana wartosci na factor
+df <- df[df$`Heart Rate` != 1111, ]
 
+df$Result <- ifelse(df$Result == "positive", "Positive", "Negative")
+df$Gender <- ifelse(df$Gender == 1, "Male", "Female")
+
+df$Gender <- as.factor(df$Gender)
+df$Result <- as.factor(df$Result)
+```
+
+## Opis zbioru
+
+Cechy jakościowe:
+
+```{r}
+library(pander)
+pander(summary(df[c("Gender", "Result")]))
+```
+
+Cechy ilościowe:
+
+```{r}
+library(rstatix)
+df %>% get_summary_stats(show = c("min", "median","mean", "max")) %>% select(-n) %>% pander()
+```
+
+## Wizualizacja
+
+Histogram wieku z podziałem na płeć oraz obecność ataku serca. Wyraźnie widać, że rozkład mężczyzn z atakiem serca (lewy dolny histogram) przypomina rozkład normalny. Natomiast pozostałe 3 wykresy są do siebie podobne i także przypominają rozkład normalny, tylko z o wiele mniejszą kurtozą.
+
+```{r}
+ggplot(df, aes(x = Age)) +
+  geom_histogram(binwidth = 5, color = "black", fill = "#aeaeae", boundary=1) +
+    scale_x_continuous(breaks = seq(0, 100, by = 10)) +
+  facet_grid(Gender ~ Result) +
+  labs(title = "Age Distribution by Gender and Result", x = "Age", y = "Frequency")
+```
+
+#TODO można sprawdzić test na równość średnich dla wieku obu płci
+
+```{r}
+df %>% filter(Result=="Positive")%>%  ggplot(aes(y=Age,fill=Gender))+
+  geom_boxplot()
+```
+
+#TODO poprawić output Test na równość średnich wieku kobiet i mężczyzn w zbiorze:
+
+```{r}
+wiek_mezczyzn <- df %>% filter(Gender=="Male", Result=="Positive") %>% select(Age)
+wiek_kobiet <- df %>% filter(Gender=="Female",Result=="Positive") %>% select(Age)
+t.test(wiek_mezczyzn, wiek_kobiet)
 ```
 
 ```{r}
-# przedstawienie result jako zmiennej jakościowej
-df$Result <- as.factor(df$Result)
-df$Gender <- as.factor(df$Gender)
-summary(df)
+df %>% group_by(Gender) %>% 
+  summarise(n=n(), "Percent of Positive"=round(sum(Result=="Positive")/n(),2))
 ```
+
+Na podstawie testu chi-kwadrat jak i test proporcjonalności odrzucamy hipotezę o rowności procenta pozytywnych przypadków ataku serca ze względu na płeć. Wynika z tego, że większą szansę na atak serca mają mężczyźni.
+
+```{r}
+# Tworzenie tablicy przestawnej
+table <- table(df$Gender, df$Result)
+
+# Przeprowadzenie testu proporcji (z testem chi-kwadrat)
+result_prop_test <- prop.test(table)
+chi_square_test <- chisq.test(table)
+
+data.frame("Proportion test"=round(result_prop_test$p.value,3),
+           "Chi-Square test"=round(chi_square_test$p.value,3)) %>% pander()
+```
+
+## Analiza korespondencji
+
+sprawdzic czy nam to potrzebne <https://www.statsoft.pl/textbook/stathome_stat.html?https%3A%2F%2Fwww.statsoft.pl%2Ftextbook%2Fstcoran.html> update: tam potrzeba tabliczy dwudzielczej. A my raczej takiej nie mamy jak poniżej. pewnie do usunięcia
+
++--------------------------+----------------------+------+
+|                          | \                    |      |
+|                          | Intensywność palenia |      |
++==========================+======================+======+
+| Grupa\                   | (1)\                 | (2)\ |
+| pracownicza              | Nie pali             | Mało |
++--------------------------+----------------------+------+
+| \(1\) Starsi kierownicy\ |   4\                 |   2\ |
+| (2) Młodsi kierownicy\   |   4\                 |   3\ |
+| (3) Starszy personel\    | 25\                  | 10\  |
+| (4) Młodszy personel\    | 18\                  | 24\  |
+| (5) Sekretarki           | 10                   |   6  |
++--------------------------+----------------------+------+
+| Sumy kolumn              | 61                   | 45   |
++--------------------------+----------------------+------+
+
+## Model
+
+### Wybór modelu - wypisac ktory moze byc najlepszy
+
+### stworzenie modelu
+
+### trening modelu
+
+### testowanie modelu
+
+### Podsumowanie efektywności modelu / jego przydatności
+
+## Odpowiedź na pytania badawcze i podsumowanie
 
 Wykrycie obserwacji odstających:
 
@@ -111,16 +203,13 @@ chart.Correlation(df[,c(1,3:8)])
 corrplot(cor(df[,c(1,3:8)]))
 ```
 
-```{r}
-df$Result <- ifelse(df$Result == "positive", 1, 0)
-head(df) 
-```
+GLM założenia: - Homogeneity of variance - levene test - Normality of residuals - shapiro-wilk
 
-#TODO Przeniesc Czyszczenie
-
+### Wizualizacja zmiennych
 ```{r}
-df <- df[df$`Heart Rate` != 1111, ]
-head(df)
+df$Gender <- as.numeric(df$Gender)
+library(Hmisc)
+hist.data.frame(df)
 ```
 
 ```{r}
@@ -128,14 +217,37 @@ tail(df[df$CK.MB>=300, ])
 ```
 
 ```{r}
-model <- glm(Result~., family = 'binomial', data = df[, -c(3:5)])
-summary(model)
-```
+sample <- sample(c(TRUE, FALSE), nrow(df), replace=TRUE, prob=c(0.7,0.3))
+test   <- df[!sample, ]
+df  <- df[sample, ]
 
-```{r}
-probs <- predict(model, newdata = df[, -c(3:5)], type = "response")
+
+model <- glm(Result~log(CK.MB)+log(Troponin), family = 'binomial', data = df)
+
+summary(model)
+
+probs <- predict(model, newdata = test, type = "response")
 pred <- rep(0, length(probs))
 pred[probs > .5] <- 1
-
-table(pred, df$Result)
+table(pred, test$Result)
 ```
+
+Dalex - paczka do wyjasniania modelu
+
+```{r}
+library(DALEX)
+#explainer <- explain(model, data = test[-9], y = test[9])
+#explainer %>% model_performance()
+
+#explainer %>% feature_importance() %>% plot()
+#explainer %>% model_performance()  %>% plot()
+
+```
+
+install.packages("devtools")
+
+devtools::install_github("ModelOriented/ArenaR")
+
+install.packages("arenar")
+
+library(arenar) heart_attack_ar \<- create_arena(live = TRUE) %\>% push_model(explainer) %\>% push_observations(test) run_server(heart_attack_ar)

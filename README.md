@@ -2,13 +2,19 @@
 
 # todo
 
--   przerobić opis z początku i umieścić go w odpowiednim miejscu
-
--   ustalić normalne i chorobowe zakresy wartości dla cech i przerobić odpowiednio tabelke
-
--   na podstawie tabelki przeczyscic odpowiednio zbiór danych
-
 -   umieścić 2 modele - sieć neuronowa + prosty glm i porównać wyniki
+
+-   pomysl na model:
+
+    ```         
+    1 Age           Gender       Heart Rate     Systolic.blood.pressure + blood sugar
+     
+    2  Age           Gender       Heart Rate     Diastoic.blood.pressure + blood sugar
+    ```
+
+-   footnotes: 1 <https://web.archive.org/web/20150224034615/http://www.nhlbi.nih.gov/health/health-topics/topics/cad/signs>
+
+2 <https://ec.europa.eu/eurostat/web/products-statistics-in-focus/-/ks-nk-06-010>
 
 1.  Przedstawienie zbioru danych
 
