@@ -48,11 +48,12 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 
 ## Przygotowanie zbioru / weryfikacja poprawnosci danych / brakujace wartosci
 
-caly kod którym porządkujemy dane, zmieniamy wartosci na factor, może dzielimy wiek na sekcje (18-25, 26-50)
+
 ```{r}
 library(tidyverse)
 library(foreign)
 
+# wczytanie zbioru
 df <- read.arff("data/Medicaldataset.arff")
 df <- df %>% rename(
   "Age" = age,
@@ -68,6 +69,7 @@ df <- df %>% rename(
 ```
 
 ```{r}
+#czyszczenie zbioru, zamiana wartosci na factor
 df <- df[df$`Heart Rate` != 1111, ]
 
 df$Result <- ifelse(df$Result == "positive", "Positive", "Negative")
@@ -80,44 +82,63 @@ df$Result <- as.factor(df$Result)
 
 ## Opis zbioru
 
-/ statystyczna analiza opisowa - summary, statystyki opisowe
-
-
-
+Cechy jakościowe:
 ```{r}
 library(pander)
-pander(summary(df))
+pander(summary(df[c("Gender", "Result")]))
 ```
-
+Cechy ilościowe:
 ```{r}
 library(rstatix)
-df %>% get_summary_stats(show = c("min", "median", "mean", "max"))
+df %>% get_summary_stats(show = c("min", "median","mean", "max")) %>% select(-n) %>% pander()
 ```
 
-Widoczna lewa asymetria histogramu wieku.
+## Wizualizacja
+
+Histogram wieku z podziałem na płeć oraz obecność ataku serca.
+Wyraźnie widać, że rozkład mężczyzn z atakiem serca (lewy dolny histogram) przypomina rozkład normalny.
+Natomiast pozostałe 3 wykresy są do siebie podobne i także przypominają rozkład normalny, tylko z o wiele mniejszą kurtozą.
 ```{r}
-library(ggpubr)
-df %>% gghistogram(x="Age", fill="Result")
+ggplot(df, aes(x = Age)) +
+  geom_histogram(binwidth = 5, color = "black", fill = "#aeaeae", boundary=1) +
+    scale_x_continuous(breaks = seq(0, 100, by = 10)) +
+  facet_grid(Gender ~ Result) +
+  labs(title = "Age Distribution by Gender and Result", x = "Age", y = "Frequency")
 ```
 
 #TODO można sprawdzić test na równość średnich dla wieku obu płci
 ```{r}
-df %>% ggplot(aes(y=Age,fill=Gender))+
+df %>% filter(Result=="Positive")%>%  ggplot(aes(y=Age,fill=Gender))+
   geom_boxplot()
+```
+Test na równość średnich wieku kobiet i mężczyzn w zbiorze:
+```{r}
+wiek_mezczyzn <- df %>% filter(Gender=="Male", Result=="Positive") %>% select(Age)
+wiek_kobiet <- df %>% filter(Gender=="Female",Result=="Positive") %>% select(Age)
+t.test(wiek_mezczyzn, wiek_kobiet)
 ```
 
-```{r}
-df %>% ggplot(aes(y=Diastolic.blood.pressure, fill=Result))+
-  geom_boxplot()
-```
+
+
 #TODO test na równość tego czy procent pozytywnych przypadków jest równy ze względu na płeć.
 ```{r}
 df %>% group_by(Gender) %>% 
   summarise(n=n(), "Percent of Positive"=round(sum(Result=="Positive")/n(),2))
 ```
+Na podstawie testu chi-kwadrat jak i test proporcjonalności odrzucamy hipotezę o rowności procenta pozytywnych przypadków ataku serca ze względu na płeć. Wynika z tego, że większą szansę na atak serca mają mężczyźni.
+```{r}
+# Tworzenie tablicy przestawnej
+table <- table(df$Gender, df$Result)
+
+# Przeprowadzenie testu proporcji (z testem chi-kwadrat)
+result_prop_test <- prop.test(table)
+chi_square_test <- chisq.test(table)
+
+data.frame("Proportion test"=round(result_prop_test$p.value,3),
+           "Chi-Square test"=round(chi_square_test$p.value,3)) %>% pander()
+```
 
 
-## Wizualizacja
 
 ## Analiza korespondencji
 
@@ -163,8 +184,9 @@ chart.Correlation(df[,c(1,3:8)])
 corrplot(cor(df[,c(1,3:8)]))
 ```
 
-
-#TODO Przeniesc Czyszczenie
+GLM założenia:
+- Homogeneity of variance - levene test
+- Normality of residuals - shapiro-wilk
 
 ```{r}
 tail(df[df$CK.MB>=300, ])
