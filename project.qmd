@@ -24,17 +24,27 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
++--------------------------+----------------------------------------------------------------------------------------------------------------+
 | Cecha                    | Opis                                                                                                           |
-|----------------------|--------------------------------------------------|
++==========================+================================================================================================================+
 | Age                      | Wiek pacjenta w latach                                                                                         |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
 | Heart Rate               | Maksymalne osiągnięte tętno                                                                                    |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
 | Systolic blood pressure  | Spoczynkowe skurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości 90-120 mmHg)     |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
 | Diastolic blood pressure | Spoczynkowe rozkurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości od 60-80 mmHg) |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
 | Blood sugar              | Poziom cukru we krwi (nonalne wartości do 140mg/dl)                                                            |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
 | CK-MB                    | Enzym CK-MB (mężczyźni do 7,8 ng/mL, kobiety do 4,4 ng/mL). Jest to enzym kinazy kreatynowej.                  |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
 | Troponin                 | Enzym troponiny (wartości normalne do 0,03 mikrogramów)                                                        |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
 | Result                   | Obecność zawału                                                                                                |
++--------------------------+----------------------------------------------------------------------------------------------------------------+
 
 : Cechy i ich opisy
 
@@ -47,7 +57,6 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 -   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
 ## Przygotowanie zbioru / weryfikacja poprawnosci danych / brakujace wartosci
-
 
 ```{r}
 library(tidyverse)
@@ -79,15 +88,17 @@ df$Gender <- as.factor(df$Gender)
 df$Result <- as.factor(df$Result)
 ```
 
-
 ## Opis zbioru
 
 Cechy jakościowe:
+
 ```{r}
 library(pander)
 pander(summary(df[c("Gender", "Result")]))
 ```
+
 Cechy ilościowe:
+
 ```{r}
 library(rstatix)
 df %>% get_summary_stats(show = c("min", "median","mean", "max")) %>% select(-n) %>% pander()
@@ -95,9 +106,8 @@ df %>% get_summary_stats(show = c("min", "median","mean", "max")) %>% select(-n)
 
 ## Wizualizacja
 
-Histogram wieku z podziałem na płeć oraz obecność ataku serca.
-Wyraźnie widać, że rozkład mężczyzn z atakiem serca (lewy dolny histogram) przypomina rozkład normalny.
-Natomiast pozostałe 3 wykresy są do siebie podobne i także przypominają rozkład normalny, tylko z o wiele mniejszą kurtozą.
+Histogram wieku z podziałem na płeć oraz obecność ataku serca. Wyraźnie widać, że rozkład mężczyzn z atakiem serca (lewy dolny histogram) przypomina rozkład normalny. Natomiast pozostałe 3 wykresy są do siebie podobne i także przypominają rozkład normalny, tylko z o wiele mniejszą kurtozą.
+
 ```{r}
 ggplot(df, aes(x = Age)) +
   geom_histogram(binwidth = 5, color = "black", fill = "#aeaeae", boundary=1) +
@@ -107,25 +117,27 @@ ggplot(df, aes(x = Age)) +
 ```
 
 #TODO można sprawdzić test na równość średnich dla wieku obu płci
+
 ```{r}
 df %>% filter(Result=="Positive")%>%  ggplot(aes(y=Age,fill=Gender))+
   geom_boxplot()
 ```
-Test na równość średnich wieku kobiet i mężczyzn w zbiorze:
+
+#TODO poprawić output Test na równość średnich wieku kobiet i mężczyzn w zbiorze:
+
 ```{r}
 wiek_mezczyzn <- df %>% filter(Gender=="Male", Result=="Positive") %>% select(Age)
 wiek_kobiet <- df %>% filter(Gender=="Female",Result=="Positive") %>% select(Age)
 t.test(wiek_mezczyzn, wiek_kobiet)
 ```
 
-
-
-#TODO test na równość tego czy procent pozytywnych przypadków jest równy ze względu na płeć.
 ```{r}
 df %>% group_by(Gender) %>% 
   summarise(n=n(), "Percent of Positive"=round(sum(Result=="Positive")/n(),2))
 ```
+
 Na podstawie testu chi-kwadrat jak i test proporcjonalności odrzucamy hipotezę o rowności procenta pozytywnych przypadków ataku serca ze względu na płeć. Wynika z tego, że większą szansę na atak serca mają mężczyźni.
+
 ```{r}
 # Tworzenie tablicy przestawnej
 table <- table(df$Gender, df$Result)
@@ -138,11 +150,25 @@ data.frame("Proportion test"=round(result_prop_test$p.value,3),
            "Chi-Square test"=round(chi_square_test$p.value,3)) %>% pander()
 ```
 
-
-
 ## Analiza korespondencji
 
-sprawdzic czy nam to potrzebne <https://www.statsoft.pl/textbook/stathome_stat.html?https%3A%2F%2Fwww.statsoft.pl%2Ftextbook%2Fstcoran.html>
+sprawdzic czy nam to potrzebne <https://www.statsoft.pl/textbook/stathome_stat.html?https%3A%2F%2Fwww.statsoft.pl%2Ftextbook%2Fstcoran.html> update: tam potrzeba tabliczy dwudzielczej. A my raczej takiej nie mamy jak poniżej. pewnie do usunięcia
+
++--------------------------+----------------------+------+
+|                          | \                    |      |
+|                          | Intensywność palenia |      |
++==========================+======================+======+
+| Grupa\                   | (1)\                 | (2)\ |
+| pracownicza              | Nie pali             | Mało |
++--------------------------+----------------------+------+
+| \(1\) Starsi kierownicy\ |   4\                 |   2\ |
+| (2) Młodsi kierownicy\   |   4\                 |   3\ |
+| (3) Starszy personel\    | 25\                  | 10\  |
+| (4) Młodszy personel\    | 18\                  | 24\  |
+| (5) Sekretarki           | 10                   |   6  |
++--------------------------+----------------------+------+
+| Sumy kolumn              | 61                   | 45   |
++--------------------------+----------------------+------+
 
 ## Model
 
@@ -157,13 +183,6 @@ sprawdzic czy nam to potrzebne <https://www.statsoft.pl/textbook/stathome_stat.h
 ### Podsumowanie efektywności modelu / jego przydatności
 
 ## Odpowiedź na pytania badawcze i podsumowanie
-
-Pierwsze 6 wierszy:
-
-```{r}
-head(df)
-
-```
 
 Wykrycie obserwacji odstających:
 
@@ -184,9 +203,14 @@ chart.Correlation(df[,c(1,3:8)])
 corrplot(cor(df[,c(1,3:8)]))
 ```
 
-GLM założenia:
-- Homogeneity of variance - levene test
-- Normality of residuals - shapiro-wilk
+GLM założenia: - Homogeneity of variance - levene test - Normality of residuals - shapiro-wilk
+
+### Wizualizacja zmiennych
+```{r}
+df$Gender <- as.numeric(df$Gender)
+library(Hmisc)
+hist.data.frame(df)
+```
 
 ```{r}
 tail(df[df$CK.MB>=300, ])
