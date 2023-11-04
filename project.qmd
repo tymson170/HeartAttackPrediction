@@ -205,13 +205,6 @@ corrplot(cor(df[,c(1,3:8)]))
 
 GLM założenia: - Homogeneity of variance - levene test - Normality of residuals - shapiro-wilk
 
-### Wizualizacja zmiennych
-```{r}
-df$Gender <- as.numeric(df$Gender)
-library(Hmisc)
-hist.data.frame(df)
-```
-
 ```{r}
 tail(df[df$CK.MB>=300, ])
 ```
