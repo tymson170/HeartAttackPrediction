@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.433">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -3049,7 +3049,7 @@ vertical-align: -.125em;
 <h2 class="anchored" data-anchor-id="źródło-danych">Źródło danych</h2>
 <section id="zawartość-zbioru" class="level3">
 <h3 class="anchored" data-anchor-id="zawartość-zbioru">Zawartość zbioru:</h3>
-<p>Dane do zbioru były zbierane podczas transportu karetką do szpitala pacjentów, którzy podejrzewali u siebie obecność zawału serca. Zawał mięśnia sercowego, potocznie zwany atakiem serca to martwica mięśnia sercowego spowodowana jego niedokrwieniem wskutek zamknięcia tętnicy wieńcowej doprowadzającej krew do serca.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> W europie choroby układu krążenia są najczęstszą przyczyną zgonów. Z powodu schorzeń sercowo-naczyniowych w tym zawału mięśnia sercowego, umiera dwa razy więcej osób niż z powodu chorób nowotworowych.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Zbiór danych zawiera 1319 obserwacji i 9 cech, z czego jedna odnosi się do obecności ataku serca.</p>
+<p>Dane do zbioru były zbierane podczas transportu karetką do szpitala pacjentów, którzy podejrzewali u siebie obecność zawału serca. Zawał mięśnia sercowego, potocznie zwany atakiem serca to martwica mięśnia sercowego spowodowana jego niedokrwieniem wskutek zamknięcia tętnicy wieńcowej doprowadzającej krew do serca.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> W Europie choroby układu krążenia są najczęstszą przyczyną zgonów. Z powodu schorzeń sercowo-naczyniowych w tym zawału mięśnia sercowego, umiera dwa razy więcej osób niż z powodu chorób nowotworowych.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Zbiór danych zawiera 1319 obserwacji i 9 cech, z czego jedna odnosi się do obecności ataku serca.</p>
 <p>Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tętnicze, poziom cukru we krwi, CK-MB (kineaza kreatynowa) i troponina reprezentują pola wejściowe, podczas gdy pole wyjściowe odnosi się do obecności zawału serca, który jest podzielone na dwie kategorie (0 i 1); “0” odnosi się do braku zawału serca, podczas gdy “1” odnosi się do obecności zawału serca.</p>
 </section>
 <section id="przedstawienie-zmiennych-opis-jakie-są-i-co-znaczą" class="level3">
@@ -3180,77 +3180,9 @@ vertical-align: -.125em;
 <p>Cechy ilościowe:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstatix)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">get_summary_stats</span>(<span class="at">show =</span> <span class="fu">c</span>(<span class="st">&quot;min&quot;</span>, <span class="st">&quot;median&quot;</span>,<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;max&quot;</span>)) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>n) <span class="sc">%&gt;%</span> <span class="fu">pander</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">get_summary_stats</span>(<span class="at">show =</span> <span class="fu">c</span>(<span class="st">&quot;min&quot;</span>, <span class="st">&quot;median&quot;</span>,<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;max&quot;</span>)) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>n) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">sd =</span> <span class="fu">apply</span>(df, <span class="dv">2</span>, sd)) <span class="sc">%&gt;%</span>  <span class="fu">pander</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<colgroup>
-<col style="width: 37%">
-<col style="width: 11%">
-<col style="width: 12%">
-<col style="width: 11%">
-<col style="width: 11%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: center;">variable</th>
-<th style="text-align: center;">min</th>
-<th style="text-align: center;">median</th>
-<th style="text-align: center;">mean</th>
-<th style="text-align: center;">max</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">Age</td>
-<td style="text-align: center;">14</td>
-<td style="text-align: center;">58</td>
-<td style="text-align: center;">56.21</td>
-<td style="text-align: center;">103</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">Heart Rate</td>
-<td style="text-align: center;">20</td>
-<td style="text-align: center;">74</td>
-<td style="text-align: center;">75.98</td>
-<td style="text-align: center;">135</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">Systolic.blood.pressure</td>
-<td style="text-align: center;">42</td>
-<td style="text-align: center;">124</td>
-<td style="text-align: center;">127.1</td>
-<td style="text-align: center;">223</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">Diastolic.blood.pressure</td>
-<td style="text-align: center;">38</td>
-<td style="text-align: center;">72</td>
-<td style="text-align: center;">72.22</td>
-<td style="text-align: center;">154</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">Blood.sugar</td>
-<td style="text-align: center;">35</td>
-<td style="text-align: center;">116</td>
-<td style="text-align: center;">146.7</td>
-<td style="text-align: center;">541</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">CK.MB</td>
-<td style="text-align: center;">0.321</td>
-<td style="text-align: center;">2.85</td>
-<td style="text-align: center;">15.3</td>
-<td style="text-align: center;">300</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">Troponin</td>
-<td style="text-align: center;">0.001</td>
-<td style="text-align: center;">0.014</td>
-<td style="text-align: center;">0.361</td>
-<td style="text-align: center;">10.3</td>
-</tr>
-</tbody>
-</table>
+<p>Quitting from lines 109-111 [unnamed-chunk-4] (project.rmarkdown) Error in <code>mutate()</code>: ℹ In argument: <code>sd = apply(df, 2, sd)</code>. Caused by error: ! <code>sd</code> must be size 7 or 1, not 9. Backtrace: 1. … %&gt;% pander() 10. dplyr:::dplyr_internal_error(…)</p>
 </div>
 </div>
 </section>
@@ -3345,7 +3277,7 @@ mean of x mean of y
 <colgroup>
 <col style="width: 37%">
 <col style="width: 31%">
-<col style="width: 9%">
+<col style="width: 19%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -3733,19 +3665,19 @@ glm(formula = Result ~ log(CK.MB) + log(Troponin), family = &quot;binomial&quot;
 
 Coefficients:
               Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept)     9.8992     0.8746   11.32   &lt;2e-16 ***
-log(CK.MB)      2.1623     0.1993   10.85   &lt;2e-16 ***
-log(Troponin)   2.6994     0.2113   12.78   &lt;2e-16 ***
+(Intercept)     8.7047     0.7693   11.32   &lt;2e-16 ***
+log(CK.MB)      2.0357     0.1870   10.88   &lt;2e-16 ***
+log(Troponin)   2.4321     0.1887   12.89   &lt;2e-16 ***
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 
 (Dispersion parameter for binomial family taken to be 1)
 
-    Null deviance: 1236.71  on 928  degrees of freedom
-Residual deviance:  416.26  on 926  degrees of freedom
-AIC: 422.26
+    Null deviance: 1239.38  on 926  degrees of freedom
+Residual deviance:  466.32  on 924  degrees of freedom
+AIC: 472.32
 
-Number of Fisher Scoring iterations: 8</code></pre>
+Number of Fisher Scoring iterations: 7</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, <span class="at">newdata =</span> test, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="fu">length</span>(probs))</span>
@@ -3754,8 +3686,8 @@ Number of Fisher Scoring iterations: 8</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>    
 pred Negative Positive
-   0      131       18
-   1       22      216</code></pre>
+   0      137       17
+   1       11      224</code></pre>
 </div>
 </div>
 <p>Dalex - paczka do wyjasniania modelu</p>
