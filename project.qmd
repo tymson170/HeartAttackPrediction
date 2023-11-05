@@ -214,3 +214,71 @@ devtools::install_github("ModelOriented/ArenaR")
 install.packages("arenar")
 
 library(arenar) heart_attack_ar \<- create_arena(live = TRUE) %\>% push_model(explainer) %\>% push_observations(test) run_server(heart_attack_ar)
+
+## Model drzewa decyzyjnego
+
+### Biblioteki
+
+```{r message=FALSE}
+library(foreign)
+library(dplyr)
+library(caret)
+library(rpart)
+library(rattle)
+```
+
+### Przygotowanie danych
+
+```{r}
+df <- read.arff("Data/Medicaldataset.arff")
+
+df <- df %>% rename(
+  "Age" = age,
+  "Gender" = gender,
+  "Heart Rate" = impluse,
+  "Systolic.blood.pressure" = pressurehight,
+  "Diastolic.blood.pressure" = pressurelow,
+  "Blood.sugar" = glucose,
+  "CK.MB" = kcm,
+  "Troponin" = troponin,
+  "Result" = class
+)
+
+
+df <- df[df$`Heart Rate` != 1111, ]
+
+df$Result <- ifelse(df$Result == "positive", 1, 0)
+str(df)
+```
+
+### Podział zbioru na treningowy i testowy
+
+```{r}
+podzial <- createDataPartition(y = df$Result, 
+                               times = 1, 
+                               p = 0.7, 
+                               list = F)
+
+train <- df[podzial, ]
+test <- df[-podzial, ]
+```
+
+### Trenowanie modelu
+
+```{r}
+model <- rpart(Result ~ ., method = "class", data = train)
+
+fancyRpartPlot(model, caption = "")
+```
+
+### Testowanie dokładności modelu na zbiorze testowym
+
+```{r}
+model_test <- predict(model, test)
+model_test <- as.data.frame(model_test)
+
+model_test <- model_test %>% 
+  mutate(Result = ifelse(`0` >= .5, 0, 1))
+
+table(test$Result, model_test$Result)
+```
