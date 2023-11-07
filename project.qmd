@@ -14,11 +14,7 @@ editor_options:
 
 ### Zawartość zbioru:
 
-Dane do zbioru były zbierane podczas transportu karetką do szpitala pacjentów, którzy podejrzewali u siebie obecność zawału serca. Zawał mięśnia sercowego, potocznie zwany atakiem serca to martwica mięśnia sercowego spowodowana jego niedokrwieniem wskutek zamknięcia tętnicy wieńcowej doprowadzającej krew do serca.[^1] W Europie choroby układu krążenia są najczęstszą przyczyną zgonów. Z powodu schorzeń sercowo-naczyniowych w tym zawału mięśnia sercowego, umiera dwa razy więcej osób niż z powodu chorób nowotworowych.[^2] Zbiór danych zawiera 1319 obserwacji i 9 cech, z czego jedna odnosi się do obecności ataku serca.
-
-[^1]: <https://web.archive.org/web/20150224034615/http://www.nhlbi.nih.gov/health/health-topics/topics/cad/signs>
-
-[^2]: <https://ec.europa.eu/eurostat/web/products-statistics-in-focus/-/ks-nk-06-010>
+Dane do zbioru były zbierane podczas transportu karetką do szpitala pacjentów, którzy podejrzewali u siebie obecność zawału serca. Zawał mięśnia sercowego, potocznie zwany atakiem serca to martwica mięśnia sercowego spowodowana jego niedokrwieniem wskutek zamknięcia tętnicy wieńcowej doprowadzającej krew do serca. W Europie choroby układu krążenia są najczęstszą przyczyną zgonów. Z powodu schorzeń sercowo-naczyniowych w tym zawału mięśnia sercowego, umiera dwa razy więcej osób niż z powodu chorób nowotworowych. Zbiór danych zawiera 1319 obserwacji i 9 cech, z czego jedna odnosi się do obecności ataku serca.
 
 Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tętnicze, poziom cukru we krwi, CK-MB (kineaza kreatynowa) i troponina reprezentują pola wejściowe, podczas gdy pole wyjściowe odnosi się do obecności zawału serca, który jest podzielone na dwie kategorie (0 i 1); "0" odnosi się do braku zawału serca, podczas gdy "1" odnosi się do obecności zawału serca.
 
@@ -28,19 +24,19 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 |-----------------|-------------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
-| Heart Rate               | Maksymalne osiągnięte tętno                                                                                    |
+| Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
 | Systolic blood pressure  | Spoczynkowe skurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości 90-120 mmHg)     |
 | Diastolic blood pressure | Spoczynkowe rozkurczowe ciśnienie krwi (w mmHg, podczas dojazdu do szpitala) (normalne wartości od 60-80 mmHg) |
-| Blood sugar              | Poziom cukru we krwi (nonalne wartości do 140mg/dl)                                                            |
+| Blood sugar              | Poziom cukru we krwi (normalne wartości do 140mg/dl)                                                           |
 | CK-MB                    | Enzym CK-MB (mężczyźni do 7,8 ng/mL, kobiety do 4,4 ng/mL). Jest to enzym kinazy kreatynowej.                  |
 | Troponin                 | Enzym troponiny (wartości normalne do 0,03 mikrogramów)                                                        |
-| Result                   | Obecność zawału                                                                                                |
+| Result                   | Obecność zawału (0 - brak zawału, 1 - zawał)                                                                   |
 
 : Cechy i ich opisy
 
 ## Cele badawcze
 
--   Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie (wiek, płeć, tętno, ciśnienie krwi, poziom cukru we krwi, CK-MB, troponina), przewiduje czy miał zawał serca.
+-   Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie (wiek, płeć, tętno, ciśnienie krwi, poziom cukru we krwi, CK-MB, troponina), przewiduje czy miał on zawał serca.
 
 -   Dokonanie segmentacji pacjentów, aby zidentyfikować grupy pacjentów o podobnym ryzyku wystąpienia zawału serca.
 
@@ -68,11 +64,19 @@ df <- df %>% rename(
 ```
 
 ```{r}
+hist(df$`Heart Rate`)
+df[df$`Heart Rate`>400, ]
+```
+
+Występują trzy obserwacje, w których tętno wynosi 1111. Normalne tętno wynosi maksymalnie 100 uderzeń serca na minutę więc są to nieprawidłowe dane, najprawdopodobniej spowodowane błędem przy wpisywaniu danych, które należy usunąć.
+
+```{r}
 #czyszczenie zbioru, zamiana wartosci na factor
 df <- df[df$`Heart Rate` != 1111, ]
 
-df$Result <- ifelse(df$Result == "positive", "Positive", "Negative")
-df$Gender <- ifelse(df$Gender == 1, "Male", "Female")
+str(df)
+
+df$Result <- ifelse(df$Result == "positive", 1, 0)
 
 df$Gender <- as.factor(df$Gender)
 df$Result <- as.factor(df$Result)
@@ -116,14 +120,14 @@ df %>% filter(Result=="Positive")%>%  ggplot(aes(y=Age,fill=Gender))+
 #TODO poprawić output Test na równość średnich wieku kobiet i mężczyzn w zbiorze:
 
 ```{r}
-wiek_mezczyzn <- df %>% filter(Gender=="Male", Result=="Positive") %>% select(Age)
-wiek_kobiet <- df %>% filter(Gender=="Female",Result=="Positive") %>% select(Age)
+wiek_mezczyzn <- df %>% filter(Gender==1, Result==1) %>% select(Age)
+wiek_kobiet <- df %>% filter(Gender==0,Result==1) %>% select(Age)
 t.test(wiek_mezczyzn, wiek_kobiet)
 ```
 
 ```{r}
 df %>% group_by(Gender) %>% 
-  summarise(n=n(), "Percent of Positive"=round(sum(Result=="Positive")/n(),2))
+  summarise(n=n(), "Percent of Positive"=round(sum(Result==1)/n(),2))
 ```
 
 Na podstawie testu chi-kwadrat jak i test proporcjonalności odrzucamy hipotezę o rowności procenta pozytywnych przypadków ataku serca ze względu na płeć. Wynika z tego, że większą szansę na atak serca mają mężczyźni.
