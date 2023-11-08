@@ -21,7 +21,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|-----------------|-------------------------------------------------------|
+|------------------|------------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -142,6 +142,14 @@ chi_square_test <- chisq.test(table)
 
 data.frame("Proportion test"=round(result_prop_test$p.value,3),
            "Chi-Square test"=round(chi_square_test$p.value,3)) %>% pander()
+```
+
+### Wykres zależności CK.MB od Troponiny z podziałem na pacjentów z zawałem i bez
+
+```{r}
+ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point() +
+  scale_color_manual(values = c("0" = "blue", "1" = "red")) + 
+  labs(x = "CK.MB", y = "Troponin", col = "Result") + scale_x_continuous(limits = c(0, 10)) + scale_y_continuous(limits = c(0, 1)) + theme_minimal()
 ```
 
 ## Model
