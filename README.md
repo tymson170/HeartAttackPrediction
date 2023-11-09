@@ -2,15 +2,8 @@
 
 # todo
 
--   umieścić 2 modele - sieć neuronowa + prosty glm i porównać wyniki
+- dodać porównanie modelu z wartosciami troponiny / ckmb do tych stosowanych w medycynie jako markery
 
--   pomysl na model:
-
-    ```         
-    1 Age           Gender       Heart Rate     Systolic.blood.pressure + blood sugar
-     
-    2  Age           Gender       Heart Rate     Diastoic.blood.pressure + blood sugar
-    ```
 
 -   footnotes: 1 <https://web.archive.org/web/20150224034615/http://www.nhlbi.nih.gov/health/health-topics/topics/cad/signs>
 
