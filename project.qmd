@@ -21,7 +21,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|-------------------|-----------------------------------------------------|
+|--------------------|----------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -117,7 +117,6 @@ ggplot(df, aes(x = Age)) +
   labs(title = "Age Distribution by Gender and Result", x = "Age", y = "Frequency")
 ```
 
-
 ```{r}
 str(df)
 #distibution of heart disease
@@ -142,7 +141,6 @@ df %>%
   labs(title = "Distribution of Variables by Result", x = "Value", y = "Frequency") +
   scale_fill_discrete(labels=c("Negative", "Positive"))
 ```
-
 
 #TODO poprawić output Test na równość średnich wieku kobiet i mężczyzn w zbiorze:
 
@@ -267,30 +265,6 @@ library(dplyr)
 library(caret)
 library(rpart)
 library(rattle)
-```
-
-### Przygotowanie danych
-
-```{r}
-df <- read.arff("Data/Medicaldataset.arff")
-
-df <- df %>% rename(
-  "Age" = age,
-  "Gender" = gender,
-  "Heart Rate" = impluse,
-  "Systolic.blood.pressure" = pressurehight,
-  "Diastolic.blood.pressure" = pressurelow,
-  "Blood.sugar" = glucose,
-  "CK.MB" = kcm,
-  "Troponin" = troponin,
-  "Result" = class
-)
-
-
-df <- df[df$`Heart Rate` != 1111, ]
-
-df$Result <- ifelse(df$Result == "positive", 1, 0)
-str(df)
 ```
 
 ### Podział zbioru na treningowy i testowy
