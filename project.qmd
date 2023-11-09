@@ -183,16 +183,25 @@ ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point() +
 ## Model
 
 ### Wybór modelu - wypisac ktory moze byc najlepszy
-
+  - wypisać jakich modeli próbowaliśmy użyć
+  - wypisać jakie parametry mieliśmy do dyspozycji
+  - wypisać jakie parametry wybraliśmy i dlaczego
+  - wypisać jakie parametry odrzuciliśmy i dlaczego
+  - wypisać jakie parametry byłyby przydatne, gdybyśmy były w zbiorze
+  
 ### stworzenie modelu
-
+  - kod dot. stworzenia modelu drzewa decyzyjnego
+  
 ### trening modelu
 
 ### testowanie modelu
 
 ### Podsumowanie efektywności modelu / jego przydatności
+- apropo ad3 -   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
 ## Odpowiedź na pytania badawcze i podsumowanie
+
+
 
 Wykrycie obserwacji odstających:
 
@@ -246,14 +255,6 @@ library(DALEX)
 #explainer %>% model_performance()  %>% plot()
 
 ```
-
-install.packages("devtools")
-
-devtools::install_github("ModelOriented/ArenaR")
-
-install.packages("arenar")
-
-library(arenar) heart_attack_ar \<- create_arena(live = TRUE) %\>% push_model(explainer) %\>% push_observations(test) run_server(heart_attack_ar)
 
 ## Model drzewa decyzyjnego
 
