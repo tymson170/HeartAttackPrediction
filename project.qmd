@@ -21,7 +21,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|-------------------|-----------------------------------------------------|
+|--------------------|----------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -117,7 +117,6 @@ ggplot(df, aes(x = Age)) +
   labs(title = "Age Distribution by Gender and Result", x = "Age", y = "Frequency")
 ```
 
-
 ```{r}
 str(df)
 #distibution of heart disease
@@ -142,7 +141,6 @@ df %>%
   labs(title = "Distribution of Variables by Result", x = "Value", y = "Frequency") +
   scale_fill_discrete(labels=c("Negative", "Positive"))
 ```
-
 
 #TODO poprawić output Test na równość średnich wieku kobiet i mężczyzn w zbiorze:
 
@@ -185,16 +183,25 @@ ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point() +
 ## Model
 
 ### Wybór modelu - wypisac ktory moze byc najlepszy
-
+  - wypisać jakich modeli próbowaliśmy użyć
+  - wypisać jakie parametry mieliśmy do dyspozycji
+  - wypisać jakie parametry wybraliśmy i dlaczego
+  - wypisać jakie parametry odrzuciliśmy i dlaczego
+  - wypisać jakie parametry byłyby przydatne, gdybyśmy były w zbiorze
+  
 ### stworzenie modelu
-
+  - kod dot. stworzenia modelu drzewa decyzyjnego
+  
 ### trening modelu
 
 ### testowanie modelu
 
 ### Podsumowanie efektywności modelu / jego przydatności
+- apropo ad3 -   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
 ## Odpowiedź na pytania badawcze i podsumowanie
+
+
 
 Wykrycie obserwacji odstających:
 
@@ -249,14 +256,6 @@ library(DALEX)
 
 ```
 
-install.packages("devtools")
-
-devtools::install_github("ModelOriented/ArenaR")
-
-install.packages("arenar")
-
-library(arenar) heart_attack_ar \<- create_arena(live = TRUE) %\>% push_model(explainer) %\>% push_observations(test) run_server(heart_attack_ar)
-
 ## Model drzewa decyzyjnego
 
 ### Biblioteki
@@ -267,30 +266,6 @@ library(dplyr)
 library(caret)
 library(rpart)
 library(rattle)
-```
-
-### Przygotowanie danych
-
-```{r}
-df <- read.arff("Data/Medicaldataset.arff")
-
-df <- df %>% rename(
-  "Age" = age,
-  "Gender" = gender,
-  "Heart Rate" = impluse,
-  "Systolic.blood.pressure" = pressurehight,
-  "Diastolic.blood.pressure" = pressurelow,
-  "Blood.sugar" = glucose,
-  "CK.MB" = kcm,
-  "Troponin" = troponin,
-  "Result" = class
-)
-
-
-df <- df[df$`Heart Rate` != 1111, ]
-
-df$Result <- ifelse(df$Result == "positive", 1, 0)
-str(df)
 ```
 
 ### Podział zbioru na treningowy i testowy
