@@ -324,3 +324,57 @@ model_test <- model_test %>%
 
 table(test$Result, model_test$Result)
 ```
+
+## Modele bez zmiennych CK.MB i Troponin
+
+```{r}
+df2 <- df %>% 
+  select(Age, Gender, `Heart Rate`, Systolic.blood.pressure, Diastolic.blood.pressure, Blood.sugar, Result)
+```
+
+### Drzewo decyzyjne
+
+```{r}
+podzial2 <- createDataPartition(y = df2$Result, 
+                                times = 1, 
+                                p = 0.7, 
+                                list = F)
+
+train2 <- df2[podzial2, ]
+test2 <- df2[-podzial2, ]
+
+model2 <- rpart(Result ~ ., method = "class", data = train2, minsplit = 100)
+
+fancyRpartPlot(model2, caption = "")
+```
+
+### Dokładność
+
+```{r}
+model_test2 <- predict(model2, test2)
+model_test2 <- as.data.frame(model_test2)
+
+model_test2 <- model_test2 %>% 
+  mutate(Result = ifelse(`0` >= .5, 0, 1))
+
+tab <- table(test2$Result, model_test2$Result)
+(tab[1, 1] + tab[2, 2])/394*100
+```
+
+## Regresja logistyczna
+
+```{r}
+model3 <- glm(Result~., family = 'binomial', data = df2)
+
+summary(model3)
+
+probs <- predict(model3, newdata = test2, type = "response")
+pred <- rep(0, length(probs))
+pred[probs > .5] <- 1
+table(pred, test2$Result)
+
+explainer2 <- explain(model3, data = test2[-7], y = test[7])
+explainer2 %>% model_performance()
+
+explainer2 %>% feature_importance() %>% plot()
+```
