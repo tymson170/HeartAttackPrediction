@@ -21,7 +21,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|--------------------|----------------------------------------------------|
+|-----------------|-------------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -47,6 +47,8 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ```{r}
 library(tidyverse)
 library(foreign)
+library(tidyverse)
+library(plotly)
 
 # wczytanie zbioru
 df <- read.arff("data/Medicaldataset.arff")
@@ -65,6 +67,12 @@ df <- df %>% rename(
 
 ```{r}
 plot(density(df$`Heart Rate`), main = "Rozkład zmiennej Heart Rate", xlab = "Tętno", ylab = "Gęstość")
+
+# library(ggplot2)
+# library(plotly)
+# wykres <- ggplot(df, aes(x = `Heart Rate`)) + geom_density() + xlab("Heart # rate") + ylab("Gęstość")
+
+# ggplotly(wykres)
 ```
 
 ```{r}
@@ -76,8 +84,6 @@ Występują trzy obserwacje, w których tętno wynosi 1111. Normalne tętno wyno
 ```{r}
 #czyszczenie zbioru, zamiana wartosci na factor
 df <- df[df$`Heart Rate` != 1111, ]
-
-str(df)
 
 df$Result <- ifelse(df$Result == "positive", 1, 0)
 
@@ -110,15 +116,20 @@ df %>% get_summary_stats(show = c("min", "median","mean", "sd", "max")) %>% sele
 Histogram wieku z podziałem na płeć oraz obecność ataku serca. Wyraźnie widać, że rozkład mężczyzn z atakiem serca (lewy dolny histogram) przypomina rozkład normalny. Natomiast pozostałe 3 wykresy są do siebie podobne i także przypominają rozkład normalny, tylko z o wiele mniejszą kurtozą.
 
 ```{r}
-ggplot(df, aes(x = Age)) +
-  geom_histogram(binwidth = 5, color = "black", fill = "#aeaeae", boundary=1) +
+age_distr <- df %>% 
+  mutate(Gender2 = ifelse(Gender == "0", "female", "male")) %>% 
+  mutate(Result2 = ifelse(Result == "0", "negative", "positive"))
+
+ggplot(age_distr, aes(x = Age, fill = Gender2)) +
+  geom_histogram(binwidth = 5, color = "black", boundary=1) +
     scale_x_continuous(breaks = seq(0, 100, by = 10)) +
-  facet_grid(Gender ~ Result) +
-  labs(title = "Age Distribution by Gender and Result", x = "Age", y = "Frequency")
+  facet_grid(Gender2 ~ Result2) +
+  labs(title = "Age Distribution by Gender and Result", x = "Age", y = "Frequency") + guides(fill = "none")
 ```
 
+\
+
 ```{r}
-str(df)
 #distibution of heart disease
 df %>% ggplot(aes(x = Result, fill=Gender, )) +
   geom_bar(position = "dodge2") +
@@ -175,33 +186,34 @@ data.frame("Proportion test"=round(result_prop_test$p.value,3),
 ### Wykres zależności CK.MB od Troponiny z podziałem na pacjentów z zawałem i bez
 
 ```{r}
-ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point() +
-  scale_color_manual(values = c("0" = "blue", "1" = "red")) + 
-  labs(x = "CK.MB", y = "Troponin", col = "Result") + scale_x_continuous(limits = c(0, 10)) + scale_y_continuous(limits = c(0, 1)) + theme_minimal()
+p <- ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point(alpha = 0.5) + scale_color_manual(values = c("1" = "red", "0" = "blue")) + labs(x = "CK.MB", y = "Troponin", col = "Result") + theme_minimal()
+
+ggplotly(p)
 ```
 
 ## Model
 
 ### Wybór modelu - wypisac ktory moze byc najlepszy
-  - wypisać jakich modeli próbowaliśmy użyć
-  - wypisać jakie parametry mieliśmy do dyspozycji
-  - wypisać jakie parametry wybraliśmy i dlaczego
-  - wypisać jakie parametry odrzuciliśmy i dlaczego
-  - wypisać jakie parametry byłyby przydatne, gdybyśmy były w zbiorze
-  
+
+-   wypisać jakich modeli próbowaliśmy użyć
+-   wypisać jakie parametry mieliśmy do dyspozycji
+-   wypisać jakie parametry wybraliśmy i dlaczego
+-   wypisać jakie parametry odrzuciliśmy i dlaczego
+-   wypisać jakie parametry byłyby przydatne, gdybyśmy były w zbiorze
+
 ### stworzenie modelu
-  - kod dot. stworzenia modelu drzewa decyzyjnego
-  
+
+-   kod dot. stworzenia modelu drzewa decyzyjnego
+
 ### trening modelu
 
 ### testowanie modelu
 
 ### Podsumowanie efektywności modelu / jego przydatności
-- apropo ad3 -   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
+
+-   apropo ad3 - Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
 ## Odpowiedź na pytania badawcze i podsumowanie
-
-
 
 Wykrycie obserwacji odstających:
 
@@ -209,7 +221,7 @@ Wykrycie obserwacji odstających:
 library(rstatix)
 names(df)
 zmienne <- c("Age", "Diastolic.blood.pressure")
-identify_outliers(df["Troponin"])
+# identify_outliers(df["Troponin"])
 
 ```
 
