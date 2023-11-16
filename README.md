@@ -35,7 +35,7 @@
 
 -   [ ] w podsumowaniu porównać wartości CKMB i troponiny, jakie mamy w modelu, do oficjanych metryk stosowanych przez lekarzy do wykrycia zawalu
 
--   [ ] dopisać że w regresji logistycznej tylko dwie zmienne są znaczące statystycznie (age i gender), ale one nie są w stanie wystarczająco dobrze wytłumaczyć czy ktoś ma zawał serca
+-   [x] dopisać że w regresji logistycznej tylko dwie zmienne są znaczące statystycznie (age i gender), ale one nie są w stanie wystarczająco dobrze wytłumaczyć czy ktoś ma zawał serca
 
 chwilowo: - do corrplotow dodac result
 
