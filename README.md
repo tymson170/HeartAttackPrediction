@@ -19,7 +19,7 @@
 
 -   [x] wywalić tabelke z ilością % pozytywnych przypadków
 
--   [ ] test na rowność % pozytywnych przypadków przesnieść
+-   [x] test na rowność % pozytywnych przypadków przesnieść
 
 -   [ ] wywalic ten 2 corrplot
 

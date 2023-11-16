@@ -117,7 +117,19 @@ ggplot(age_distr, aes(x = Age, fill = Gender2)) +
   labs(title = "Age Distribution by Gender and Result", x = "Age", y = "Frequency") + guides(fill = "none")
 ```
 
-\
+Test proporcji dla obecności ataku serca ze względu na płeć. Hipoteza zerowa zakłada, że procent pozytywnych przypadków ataku serca jest taki sam dla obu płci. Hipoteza alternatywna zakłada, że procent pozytywnych przypadków ataku serca jest różny dla obu płci.
+```{r}
+# Tworzenie tablicy przestawnej
+table <- table(df$Gender, df$Result)
+
+# Przeprowadzenie testu proporcji (z testem chi-kwadrat)
+result_prop_test <- prop.test(table)
+chi_square_test <- chisq.test(table)
+
+data.frame("Proportion test"=round(result_prop_test$p.value,3),
+           "Chi-Square test"=round(chi_square_test$p.value,3)) %>% pander()
+```
+Na podstawie testu chi-kwadrat jak i test proporcjonalności odrzucamy hipotezę o rowności procenta pozytywnych przypadków ataku serca ze względu na płeć. Wynika z tego, że większą szansę na atak serca mają mężczyźni.
 
 ```{r}
 #distibution of heart disease
@@ -150,19 +162,7 @@ wiek_kobiet <- df %>% filter(Gender==0,Result==1) %>% select(Age)
 testt <- t.test(wiek_mezczyzn, wiek_kobiet)
 ```
 
-Na podstawie testu chi-kwadrat jak i test proporcjonalności odrzucamy hipotezę o rowności procenta pozytywnych przypadków ataku serca ze względu na płeć. Wynika z tego, że większą szansę na atak serca mają mężczyźni.
 
-```{r}
-# Tworzenie tablicy przestawnej
-table <- table(df$Gender, df$Result)
-
-# Przeprowadzenie testu proporcji (z testem chi-kwadrat)
-result_prop_test <- prop.test(table)
-chi_square_test <- chisq.test(table)
-
-data.frame("Proportion test"=round(result_prop_test$p.value,3),
-           "Chi-Square test"=round(chi_square_test$p.value,3)) %>% pander()
-```
 
 ### Wykres zależności CK.MB od Troponiny z podziałem na pacjentów z zawałem i bez
 
