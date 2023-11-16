@@ -21,9 +21,9 @@
 
 -   [x] test na rowność % pozytywnych przypadków przesnieść
 
--   [ ] wywalic ten 2 corrplot
+-   [x] wywalic ten 2 corrplot
 
--   [ ] wybrac cos z corrplota i jako oddzielny wykres umiescic
+-   [ ] wybrac wykres z corrplota i jako oddzielny wykres umiescic
 
 -   [ ] wywalić test na rownosc srednich wieku (albo wymyśleć wniosek/cel po co to zrobiliśmy)
 
