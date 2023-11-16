@@ -143,20 +143,11 @@ df %>%
   scale_fill_discrete(labels=c("Negative", "Positive"))
 ```
 
-#TODO poprawić output Test na równość średnich wieku kobiet i mężczyzn w zbiorze:
 
 ```{r}
 wiek_mezczyzn <- df %>% filter(Gender==1, Result==1) %>% select(Age)
 wiek_kobiet <- df %>% filter(Gender==0,Result==1) %>% select(Age)
 testt <- t.test(wiek_mezczyzn, wiek_kobiet)
-```
-
-Wynik testu t na równość średnich wieku mężczyzn i kobiet w zbiorze wynosi `r testt$p.value %>% round(5)` i jest poniżej poziomu istotności 0.05, więc odrzucamy hipotezę o równości średnich wieku mężczyzn i kobiet w zbiorze. Wynika z tego, że w naszym zbiorze mężczyźni są starsi niż kobiety.
-
-```{r}
-df %>% group_by(Gender) %>% 
-  summarise(n=n(), "Percent of Positive"=round(sum(Result==1)/n(),2)) %>% 
-  pander()
 ```
 
 Na podstawie testu chi-kwadrat jak i test proporcjonalności odrzucamy hipotezę o rowności procenta pozytywnych przypadków ataku serca ze względu na płeć. Wynika z tego, że większą szansę na atak serca mają mężczyźni.

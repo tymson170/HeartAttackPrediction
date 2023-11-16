@@ -17,7 +17,7 @@
     -   oś y jako density (ma wypisywać % przypadków)
     -   (opcjonalnie) dodać ilość % nad słupkiem
 
--   [ ] wywalić tabelke z ilością % pozytywnych przypadków
+-   [x] wywalić tabelke z ilością % pozytywnych przypadków
 
 -   [ ] test na rowność % pozytywnych przypadków przesnieść
 
