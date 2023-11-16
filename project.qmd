@@ -21,7 +21,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|-------------------|-----------------------------------------------------|
+|--------------------|----------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -81,7 +81,10 @@ df <- df %>% rename(
 ```
 
 ```{r}
-df[df$`Heart Rate`>400, ]
+identify_outliers(df['Age']) %>% 
+  as.data.frame() %>% 
+  filter(is.extreme == TRUE) %>% 
+  kable()
 ```
 
 Występują trzy obserwacje, w których tętno wynosi 1111. Normalne tętno wynosi maksymalnie 100 uderzeń serca na minutę więc są to nieprawidłowe dane, najprawdopodobniej spowodowane błędem przy wpisywaniu danych, które należy usunąć.
@@ -131,6 +134,7 @@ ggplot(age_distr, aes(x = Age, fill = Gender2)) +
 ```
 
 Test proporcji dla obecności ataku serca ze względu na płeć. Hipoteza zerowa zakłada, że procent pozytywnych przypadków ataku serca jest taki sam dla obu płci. Hipoteza alternatywna zakłada, że procent pozytywnych przypadków ataku serca jest różny dla obu płci.
+
 ```{r}
 # Tworzenie tablicy przestawnej
 table <- table(df$Gender, df$Result)
@@ -142,6 +146,7 @@ chi_square_test <- chisq.test(table)
 data.frame("Proportion test"=round(result_prop_test$p.value,3),
            "Chi-Square test"=round(chi_square_test$p.value,3)) %>% pander()
 ```
+
 Na podstawie testu chi-kwadrat jak i test proporcjonalności odrzucamy hipotezę o rowności procenta pozytywnych przypadków ataku serca ze względu na płeć. Wynika z tego, że większą szansę na atak serca mają mężczyźni.
 
 ```{r}
@@ -171,14 +176,11 @@ df %>%
   scale_fill_discrete(labels=c("Negative", "Positive"))
 ```
 
-
 ```{r}
 wiek_mezczyzn <- df %>% filter(Gender==1, Result==1) %>% select(Age)
 wiek_kobiet <- df %>% filter(Gender==0,Result==1) %>% select(Age)
 testt <- t.test(wiek_mezczyzn, wiek_kobiet)
 ```
-
-
 
 ### Wykres zależności CK.MB od Troponiny z podziałem na pacjentów z zawałem i bez
 
