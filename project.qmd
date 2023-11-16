@@ -21,7 +21,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|-----------------|-------------------------------------------------------|
+|------------------|------------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -70,8 +70,8 @@ plot(density(df$`Heart Rate`), main = "Rozkład zmiennej Heart Rate", xlab = "T�
 
 # library(ggplot2)
 # library(plotly)
-# wykres <- ggplot(df, aes(x = `Heart Rate`)) + geom_density() + xlab("Heart # rate") + ylab("Gęstość")
-
+# wykres <- ggplot(df, aes(x = `Heart Rate`)) + geom_density() + xlab("Heart # # rate") + ylab("Gęstość")
+# 
 # ggplotly(wykres)
 ```
 
@@ -186,7 +186,7 @@ data.frame("Proportion test"=round(result_prop_test$p.value,3),
 ### Wykres zależności CK.MB od Troponiny z podziałem na pacjentów z zawałem i bez
 
 ```{r}
-p <- ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point(alpha = 0.5) + scale_color_manual(values = c("1" = "red", "0" = "blue")) + labs(x = "CK.MB", y = "Troponin", col = "Result") + theme_minimal()
+p <- ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point(alpha = 0.5) + scale_color_manual(values = c("1" = "red", "0" = "blue")) + labs(x = "CK.MB", y = "Troponin", col = "Result") + theme_minimal() + scale_y_log10() + scale_x_log10()
 
 ggplotly(p)
 ```
