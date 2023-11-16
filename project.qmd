@@ -66,16 +66,6 @@ df <- df %>% rename(
 ```
 
 ```{r}
-plot(density(df$`Heart Rate`), main = "Rozkład zmiennej Heart Rate", xlab = "Tętno", ylab = "Gęstość")
-
-# library(ggplot2)
-# library(plotly)
-# wykres <- ggplot(df, aes(x = `Heart Rate`)) + geom_density() + xlab("Heart # # rate") + ylab("Gęstość")
-# 
-# ggplotly(wykres)
-```
-
-```{r}
 df[df$`Heart Rate`>400, ]
 ```
 

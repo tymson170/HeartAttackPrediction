@@ -2,15 +2,15 @@
 
 # todo
 
--   [ ] wykres gęstości heart rate (przed czyszeczniem danych) zrobić jako interaktywny (tip: ggplotly)
+-   [x] wykres gęstości heart rate (przed czyszeczniem danych) zrobić jako interaktywny (tip: ggplotly)
 
--   [ ] to samo dla ckmb-troponin
+-   [x] to samo dla ckmb-troponin
 
--   [ ] age distibution by gender and age - zmienic 0 i 1 na p/n i male/female
+-   [x] age distibution by gender and age - zmienic 0 i 1 na p/n i male/female
 
--   [ ] wywalic str(x)
+-   [x] wywalic str(x)
 
--   [ ] "Distribution of Heart Disease"
+-   [x] "Distribution of Heart Disease"
 
     -   dodac opis
     -   labele na x'ie zmienic
