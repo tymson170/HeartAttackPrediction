@@ -2,30 +2,42 @@
 
 # todo
 
-- [ ] wykres gęstości heart rate (przed czyszeczniem danych) zrobić jako interaktywny (tip: ggplotly)
-- [ ] to samo dla ckmb-troponin
-- [ ] age distibution by gender and age - zmienic 0 i 1 na p/n i male/female
-- [ ]  wywalic str(x)
-- [ ] "Distribution of Heart Disease" 
-    - dodac opis
-    - labele na x'ie zmienic
-    - oś y jako density (ma wypisywać % przypadków)
-    - (opcjonalnie) dodać ilość % nad słupkiem
-- []  wywalić tabelke z ilością % pozytywnych przypadków
-- [] test na rowność % pozytywnych przypadków przesnieść 
-- [] wywalic ten 2 corrplot
-- [] wybrac cos z corrplota i jako oddzielny wykres umiescic
-- [] wywalić test na rownosc srednich wieku (albo wymyśleć wniosek/cel po co to zrobiliśmy)
-- [] zrobić inny test (wymyśleć jaki)
-- [] zrobić k fold cross validation (w sekcji trenowania modelu drzewa decyzyjnego)
- 
-- [] zrobić cross-validation drzewa decyzyjnego w celu znalezienia najlepszych parametrów
-- [] w podsumowaniu porównać wartości CKMB i troponiny, jakie mamy w modelu, do oficjanych metryk stosowanych przez lekarzy do wykrycia zawalu
-- [] dopisać że w regresji logistycznej tylko dwie zmienne są znaczące statystycznie (age i gender), ale one nie są w stanie wystarczająco dobrze wytłumaczyć czy ktoś ma zawał serca
- 
+-   [ ] wykres gęstości heart rate (przed czyszeczniem danych) zrobić jako interaktywny (tip: ggplotly)
 
-chwilowo:
-- do corrplotow dodac result
+-   [ ] to samo dla ckmb-troponin
+
+-   [ ] age distibution by gender and age - zmienic 0 i 1 na p/n i male/female
+
+-   [ ] wywalic str(x)
+
+-   [ ] "Distribution of Heart Disease"
+
+    -   dodac opis
+    -   labele na x'ie zmienic
+    -   oś y jako density (ma wypisywać % przypadków)
+    -   (opcjonalnie) dodać ilość % nad słupkiem
+
+-   [ ] wywalić tabelke z ilością % pozytywnych przypadków
+
+-   [ ] test na rowność % pozytywnych przypadków przesnieść
+
+-   [ ] wywalic ten 2 corrplot
+
+-   [ ] wybrac cos z corrplota i jako oddzielny wykres umiescic
+
+-   [ ] wywalić test na rownosc srednich wieku (albo wymyśleć wniosek/cel po co to zrobiliśmy)
+
+-   [ ] zrobić inny test (wymyśleć jaki)
+
+-   [ ] zrobić k fold cross validation (w sekcji trenowania modelu drzewa decyzyjnego)
+
+-   [ ] zrobić cross-validation drzewa decyzyjnego w celu znalezienia najlepszych parametrów
+
+-   [ ] w podsumowaniu porównać wartości CKMB i troponiny, jakie mamy w modelu, do oficjanych metryk stosowanych przez lekarzy do wykrycia zawalu
+
+-   [ ] dopisać że w regresji logistycznej tylko dwie zmienne są znaczące statystycznie (age i gender), ale one nie są w stanie wystarczająco dobrze wytłumaczyć czy ktoś ma zawał serca
+
+chwilowo: - do corrplotow dodac result
 
 -   umieścić 2 modele - sieć neuronowa + prosty glm i porównać wyniki
 
@@ -33,7 +45,7 @@ chwilowo:
 
     ```         
     1 Age           Gender       Heart Rate     Systolic.blood.pressure + blood sugar
-     
+
     2  Age           Gender       Heart Rate     Diastoic.blood.pressure + blood sugar
     ```
 
