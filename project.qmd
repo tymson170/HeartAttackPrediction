@@ -251,13 +251,35 @@ Dalex - paczka do wyjasniania modelu
 
 ## Model drzewa decyzyjnego
 
-### Biblioteki
-
-```{r message=FALSE}
+### Użycie cross validation do trenowania modelu
+Podział zbioru danych (90% dane treningowe i 10% dane testowe)
+```{r}
+podzial <- createDataPartition(y = df$Result, 
+                               times = 1, 
+                               p = 0.9, 
+                               list = F)
+train <- df[podzial, ]
+test <- df[-podzial, ]
 ```
 
-### Podział zbioru na treningowy i testowy
+Trenowanie modelu z użyciem cross validation
+```{r}
+model <- caret::train(x= train[-9], 
+                      y=train[,9], 
+                      method = 'rpart', 
+                      trControl = trainControl(method = 'cv', number=5))
+```
 
+Testowanie modelu i wyświetlenie tabeli pomyłek
+```{r}
+model_test <- predict(model, test)
+model_test <- as.data.frame(model_test)
+
+table(Rzeczywistość=test$Result, Przewidziano=model_test[,'model_test'])
+```
+
+### Używając domyślej funkcji rpart do trenowania drzewa decyzyjnego
+Podział zbioru na treningowy i testowy
 ```{r}
 podzial <- createDataPartition(y = df$Result, 
                                times = 1, 
@@ -266,24 +288,24 @@ podzial <- createDataPartition(y = df$Result,
 
 train <- df[podzial, ]
 test <- df[-podzial, ]
+test %>% dim()
+model_test$Result %>% head()
 ```
 
-### Trenowanie modelu
-
+Trenowanie modelu
 ```{r}
 model <- rpart(Result ~ ., method = "class", data = train)
 
 fancyRpartPlot(model, caption = "")
 ```
 
-### Testowanie dokładności modelu na zbiorze testowym
-
+Testowanie dokładności modelu na zbiorze testowym
 ```{r}
 model_test <- predict(model, test)
 model_test <- as.data.frame(model_test)
+model_test <- model_test %>% mutate(Result = ifelse(`0` >= .5, 0, 1))
 
-model_test <- model_test %>% 
-  mutate(Result = ifelse(`0` >= .5, 0, 1))
+model_test$Result %>% length()
 
 table(test$Result, model_test$Result)
 ```
@@ -311,7 +333,7 @@ model2 <- rpart(Result ~ ., method = "class", data = train2, minsplit = 100)
 fancyRpartPlot(model2, caption = "")
 ```
 
-### Dokładność
+Dokładność
 
 ```{r}
 model_test2 <- predict(model2, test2)
@@ -324,7 +346,7 @@ tab <- table(test2$Result, model_test2$Result)
 (tab[1, 1] + tab[2, 2])/394*100
 ```
 
-## Regresja logistyczna
+### Regresja logistyczna
 
 ```{r}
 model3 <- glm(Result~., family = 'binomial', data = df2)

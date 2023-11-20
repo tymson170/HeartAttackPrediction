@@ -29,9 +29,11 @@
 
 -   [ ] zrobić inny test (wymyśleć jaki)
 
--   [ ] zrobić k fold cross validation (w sekcji trenowania modelu drzewa decyzyjnego)
+-   [x] zrobić k fold cross validation (w sekcji trenowania modelu drzewa decyzyjnego)
 
--   [ ] zrobić cross-validation drzewa decyzyjnego w celu znalezienia najlepszych parametrów
+-   [ ] zrobić k fold cross validation dla regresji logistycznej
+
+-   [x] zrobić cross-validation drzewa decyzyjnego w celu znalezienia najlepszych parametrów
 
 -   [ ] w podsumowaniu porównać wartości CKMB i troponiny, jakie mamy w modelu, do oficjanych metryk stosowanych przez lekarzy do wykrycia zawalu
 
