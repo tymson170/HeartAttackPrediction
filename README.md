@@ -23,7 +23,7 @@
 
 -   [x] wywalic ten 2 corrplot
 
--   [ ] wybrac wykres z corrplota i jako oddzielny wykres umiescic
+-   [x] wybrac wykres z corrplota i jako oddzielny wykres umiescic (wybrano troponin vs ckmb w plotly)
 
 -   [ ] wywalić test na rownosc srednich wieku (albo wymyśleć wniosek/cel po co to zrobiliśmy)
 
