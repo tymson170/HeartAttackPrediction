@@ -171,11 +171,6 @@ df %>%
   scale_fill_discrete(labels=c("Negative", "Positive"))
 ```
 
-```{r}
-wiek_mezczyzn <- df %>% filter(Gender==1, Result==1) %>% select(Age)
-wiek_kobiet <- df %>% filter(Gender==0,Result==1) %>% select(Age)
-testt <- t.test(wiek_mezczyzn, wiek_kobiet)
-```
 
 ### Wykres zależności CK.MB od Troponiny z podziałem na pacjentów z zawałem i bez
 
