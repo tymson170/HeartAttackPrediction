@@ -81,7 +81,7 @@ df <- df %>% rename(
 ```
 
 ```{r}
-identify_outliers(df['Age']) %>% 
+identify_outliers(df['Heart Rate']) %>% 
   as.data.frame() %>% 
   filter(is.extreme == TRUE) %>% 
   kable()
