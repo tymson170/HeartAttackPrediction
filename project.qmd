@@ -21,7 +21,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -119,6 +119,35 @@ df %>% get_summary_stats(show = c("min", "median","mean", "sd", "max")) %>% sele
 
 ## Wizualizacja
 
+Piramida wieku
+
+```{r}
+df_sum <- df %>% 
+  group_by(Age, Gender) %>% 
+  summarise(count = n()) %>% 
+  ungroup()
+
+df_sum$neg_count <- ifelse(df_sum$Gender == 0, -df_sum$count, df_sum$count)
+df_sum
+
+# Group data into 5-year intervals
+df_sum$AgeGroup <- cut(df_sum$Age, breaks = seq(0, max(df_sum$Age) + 5, by = 5), labels = FALSE)
+
+# Summarize data within age intervals
+df_smooth <- df_sum %>%
+  group_by(AgeGroup, Gender) %>%
+  summarise(sum_neg_count = sum(neg_count))
+
+ggplot(df_smooth, aes(x = AgeGroup, y = sum_neg_count, fill = factor(Gender))) + 
+  geom_bar(stat = "identity", position = "identity") + 
+  scale_y_continuous(labels = abs, breaks = seq(-max(df_sum$count), max(df_sum$count), by = 1000)) + 
+  labs(x = "Wiek", y = "Liczba") + 
+  scale_fill_manual(values = c("0" = "#f8766d", "1" = "#00bfc4")) + 
+  theme_minimal() + coord_flip() + guides(fill = "none")
+
+# todo: zrobić ładniej 
+```
+
 Histogram wieku z podziałem na płeć oraz obecność ataku serca. Wyraźnie widać, że rozkład mężczyzn z atakiem serca (lewy dolny histogram) przypomina rozkład normalny. Natomiast pozostałe 3 wykresy są do siebie podobne i także przypominają rozkład normalny, tylko z o wiele mniejszą kurtozą.
 
 ```{r}
@@ -170,7 +199,6 @@ df %>%
   labs(title = "Distribution of Variables by Result", x = "Value", y = "Frequency") +
   scale_fill_discrete(labels=c("Negative", "Positive"))
 ```
-
 
 ### Wykres zależności CK.MB od Troponiny z podziałem na pacjentów z zawałem i bez
 
@@ -252,7 +280,9 @@ Dalex - paczka do wyjasniania modelu
 ## Model drzewa decyzyjnego
 
 ### Użycie cross validation do trenowania modelu
+
 Podział zbioru danych (90% dane treningowe i 10% dane testowe)
+
 ```{r}
 podzial <- createDataPartition(y = df$Result, 
                                times = 1, 
@@ -263,6 +293,7 @@ test <- df[-podzial, ]
 ```
 
 Trenowanie modelu z użyciem cross validation
+
 ```{r}
 model <- caret::train(x= train[-9], 
                       y=train[,9], 
@@ -271,6 +302,7 @@ model <- caret::train(x= train[-9],
 ```
 
 Testowanie modelu i wyświetlenie tabeli pomyłek
+
 ```{r}
 model_test <- predict(model, test)
 model_test <- as.data.frame(model_test)
@@ -279,7 +311,9 @@ table(Rzeczywistość=test$Result, Przewidziano=model_test[,'model_test'])
 ```
 
 ### Używając domyślej funkcji rpart do trenowania drzewa decyzyjnego
+
 Podział zbioru na treningowy i testowy
+
 ```{r}
 podzial <- createDataPartition(y = df$Result, 
                                times = 1, 
@@ -293,6 +327,7 @@ model_test$Result %>% head()
 ```
 
 Trenowanie modelu
+
 ```{r}
 model <- rpart(Result ~ ., method = "class", data = train)
 
@@ -300,6 +335,7 @@ fancyRpartPlot(model, caption = "")
 ```
 
 Testowanie dokładności modelu na zbiorze testowym
+
 ```{r}
 model_test <- predict(model, test)
 model_test <- as.data.frame(model_test)
