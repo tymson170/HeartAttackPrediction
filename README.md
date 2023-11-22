@@ -23,15 +23,17 @@
 
 -   [x] wywalic ten 2 corrplot
 
--   [ ] wybrac wykres z corrplota i jako oddzielny wykres umiescic
+-   [x] wybrac wykres z corrplota i jako oddzielny wykres umiescic (wybrano troponin vs ckmb w plotly)
 
--   [ ] wywalić test na rownosc srednich wieku (albo wymyśleć wniosek/cel po co to zrobiliśmy)
+-   [x] wywalić test na rownosc srednich wieku (albo wymyśleć wniosek/cel po co to zrobiliśmy)
 
 -   [ ] zrobić inny test (wymyśleć jaki)
 
--   [ ] zrobić k fold cross validation (w sekcji trenowania modelu drzewa decyzyjnego)
+-   [x] zrobić k fold cross validation (w sekcji trenowania modelu drzewa decyzyjnego)
 
--   [ ] zrobić cross-validation drzewa decyzyjnego w celu znalezienia najlepszych parametrów
+-   [ ] zrobić k fold cross validation dla regresji logistycznej
+
+-   [x] zrobić cross-validation drzewa decyzyjnego w celu znalezienia najlepszych parametrów
 
 -   [ ] w podsumowaniu porównać wartości CKMB i troponiny, jakie mamy w modelu, do oficjanych metryk stosowanych przez lekarzy do wykrycia zawalu
 
