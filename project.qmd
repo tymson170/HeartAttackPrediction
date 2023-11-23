@@ -138,9 +138,14 @@ df_sum
 # Group data into 5-year intervals
 df_sum$AgeGroup <- cut(df_sum$Age, breaks = seq(0, max(df_sum$Age) + 5, by = 5), labels = FALSE)
 
+age_breaks <- seq(14, 105, 3)
+df_sum$AgeGroup <- cut(df_sum$Age, breaks = age_breaks, labels = c(1:30), include.lowest = TRUE)
+
+df_sum$AgeGroup <- as.numeric(df_sum$AgeGroup)
+
+
 df_pop <- df_sum %>% 
-  mutate(AgeGroup = ceiling((Age-9)/5)) %>% 
-  mutate(AgeLowerLimit = 10 + 5*(AgeGroup-1)) %>% 
+  mutate(AgeLowerLimit = 14 + 3*(AgeGroup-1)) %>% 
   group_by(AgeGroup) %>% 
   mutate(Population = n())
 
