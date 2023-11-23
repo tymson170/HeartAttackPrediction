@@ -42,7 +42,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 
 -   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
-## Przygotowanie zbioru / weryfikacja poprawnosci danych / brakujace wartosci
+## Przygotowanie zbioru, weryfikacja poprawnosci danych, brakujace wartosci
 
 ```{r, echo=FALSE}
 library(tidyverse)
@@ -65,7 +65,6 @@ library(rattle)
 ```
 
 ```{r}
-# wczytanie zbioru
 df <- read.arff("data/Medicaldataset.arff")
 df <- df %>% rename(
   "Age" = age,
@@ -81,27 +80,30 @@ df <- df %>% rename(
 ```
 
 ```{r}
-identify_outliers(df['Heart Rate']) %>% 
-  as.data.frame() %>% 
-  filter(is.extreme == TRUE) %>% 
-  kable()
-```
-
-Występują trzy obserwacje, w których tętno wynosi 1111. Normalne tętno wynosi maksymalnie 100 uderzeń serca na minutę więc są to nieprawidłowe dane, najprawdopodobniej spowodowane błędem przy wpisywaniu danych, które należy usunąć.
-
-```{r}
-#czyszczenie zbioru, zamiana wartosci na factor
-df <- df[df$`Heart Rate` != 1111, ]
-
+# zmiana cech na factor
 df$Result <- ifelse(df$Result == "positive", 1, 0)
 
 df$Gender <- as.factor(df$Gender)
 df$Result <- as.factor(df$Result)
+
+df %>% get_summary_stats(show = c("min", "median","mean", "sd", "max")) %>% select(-n) %>%  pander()
 ```
+Zmienna Heart Rate zawiera watości maksymalne 1111, które są błędem. Sprawdzimy dokładniej tę zmienną.
+
+```{r}
+identify_outliers(df['Heart Rate']) %>% 
+  as.data.frame() %>% 
+  filter(is.extreme == TRUE) %>% 
+  kable()
+
+df <- df[df$`Heart Rate` != 1111, ]
+```
+
+Występują trzy obserwacje, w których tętno wynosi 1111. Normalne tętno wynosi maksymalnie 100 uderzeń serca na minutę więc są to nieprawidłowe dane, najprawdopodobniej spowodowane błędem przy wpisywaniu danych, które należy usunąć.
 
 ## Opis zbioru
 
-Cechy jakościowe:
+#### Cechy jakościowe:
 
 ```{r}
 
@@ -111,11 +113,14 @@ levels(df2$Gender) <- c("Female", "Male")
 df2 %>% summary() %>% pander()
 ```
 
-Cechy ilościowe:
+W zbiorze jest 1316 obserwacji. Cech jakościowych jest dwie. Osób z zawałem serca jest 807, natomiast 509 ma wynik negatywny. Kobiet w zbiorze jest 447, a mężczyzn 869.
+
+#### Cechy ilościowe:
 
 ```{r}
 df %>% get_summary_stats(show = c("min", "median","mean", "sd", "max")) %>% select(-n) %>%  pander()
 ```
+Zbiór danych przedstawia zróżnicowany zakres wskaźników medycznych, odzwierciedlających parametry związane ze zdrowiem poszczególnych osób. Wiek waha się od 14 do 103 lat, co wskazuje na szeroki rozkład wiekowy. Pomiary tętna i ciśnienia krwi wykazują typowe wartości, z umiarkowaną zmiennością. W szczególności poziom cukru we krwi wykazuje znaczną zmienność, ze średnią 146,7 i znacznym odchyleniem standardowym 74,98. Markery CK.MB i Troponina, związane ze zdrowiem serca, wykazują znaczną zmienność, szczególnie w przypadku CK.MB, gdzie średnia jest znacznie wyższa niż mediana, co sugeruje potencjalną skośność. Te spostrzeżenia podkreślają znaczenie zbadania charakterystyki rozkładu każdej zmiennej dla lepszego zrozumienia zbioru danych.
 
 ## Wizualizacja
 
@@ -160,8 +165,8 @@ ggplot(df_sum, aes(x = Age, y = neg_count, fill = factor(Gender))) +
 # todo: zrobić ładniej 
 ```
 
-Histogram wieku z podziałem na płeć oraz obecność ataku serca. Wyraźnie widać, że rozkład mężczyzn z atakiem serca (lewy dolny histogram) przypomina rozkład normalny. Natomiast pozostałe 3 wykresy są do siebie podobne i także przypominają rozkład normalny, tylko z o wiele mniejszą kurtozą.
 
+#### Histogram wieku z podziałem na płeć oraz obecność ataku serca
 ```{r}
 age_distr <- df %>% 
   mutate(Gender2 = ifelse(Gender == "0", "female", "male")) %>% 
@@ -173,8 +178,11 @@ ggplot(age_distr, aes(x = Age, fill = Gender2)) +
   facet_grid(Gender2 ~ Result2) +
   labs(title = "Age Distribution by Gender and Result", x = "Age", y = "Frequency") + guides(fill = "none")
 ```
+ Wyraźnie widać, że rozkład mężczyzn z atakiem serca (lewy dolny histogram) przypomina rozkład normalny. Natomiast pozostałe 3 wykresy są do siebie podobne i także przypominają rozkład normalny, tylko z o wiele mniejszą kurtozą. Możemy zauważyć, że różnica między brakiem, a istnieniem zawału serca jest o wiele większa wśród mężczyzn. Naszą hipotezę sprawdzimy testem proporcji.
 
-Test proporcji dla obecności ataku serca ze względu na płeć. Hipoteza zerowa zakłada, że procent pozytywnych przypadków ataku serca jest taki sam dla obu płci. Hipoteza alternatywna zakłada, że procent pozytywnych przypadków ataku serca jest różny dla obu płci.
+#### Test proporcji dla obecności ataku serca ze względu na płeć
+Hipoteza zerowa zakłada, że procent pozytywnych przypadków ataku serca jest taki sam dla obu płci. 
+Hipoteza alternatywna zakłada, że procent pozytywnych przypadków ataku serca jest różny dla obu płci.
 
 ```{r}
 # Tworzenie tablicy przestawnej
@@ -190,18 +198,24 @@ data.frame("Proportion test"=round(result_prop_test$p.value,3),
 
 Na podstawie testu chi-kwadrat jak i test proporcjonalności odrzucamy hipotezę o rowności procenta pozytywnych przypadków ataku serca ze względu na płeć. Wynika z tego, że większą szansę na atak serca mają mężczyźni.
 
-```{r}
-#distibution of heart disease
-df %>% ggplot(aes(x = Result, fill=Gender, )) +
-  geom_bar(position = "dodge2") +
-  labs(title = "Distribution of Heart Disease", x = "Result", y = "Frequency")+
-  scale_fill_discrete(labels=c("Female", "Male"))
-```
+####  Wykres korelacji cech
 
-```{r}
-chart.Correlation(df[,c(1,3:8)])
-```
+##### Dla przypadkow z atakiem serca
+```{r warning=FALSE}
 
+df %>% filter(Result == 1) %>% 
+  select(c(-Result,-Gender)) %>%
+  chart.Correlation()
+```
+##### Dla przypadkow bez ataku serca
+```{r warning=FALSE}
+df %>% filter(Result == 0) %>% 
+  select(c(-Result,-Gender)) %>%
+  chart.Correlation()
+```
+Powyższe wykresy są bardzo do siebie podobne. Jedyną wyraźną cechą różniącą je jest cecha CK.MB, która dla zdrowych pacjentów jest w zakresie 0-7, a dla osób z zawałem serca od 0-300.
+
+#### Histogram dla każdej cechy, z wizualnym podziałem na wynik
 ```{r}
 df %>% 
   pivot_longer(cols = c(1, 3, 4, 5, 6, 7, 8), names_to = "variable", values_to = "value") %>% 
@@ -212,13 +226,15 @@ df %>%
   scale_fill_discrete(labels=c("Negative", "Positive"))
 ```
 
+
 ### Wykres zależności CK.MB od Troponiny z podziałem na pacjentów z zawałem i bez
 
 ```{r}
-p <- ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point(alpha = 0.5) + scale_color_manual(values = c("1" = "red", "0" = "blue")) + labs(x = "CK.MB", y = "Troponin", col = "Result") + theme_minimal() + scale_y_log10() + scale_x_log10()
+p <- ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point(alpha = 0.5) + scale_color_manual(values = c("1" = "red", "0" = "blue")) + labs(x = "CK.MB", y = "Troponina (skala logarytmiczna)", col = "Wynik") + theme_minimal() + scale_y_log10() + scale_x_log10()
 
 ggplotly(p)
 ```
+Na powyższym wykresie zależności CK.MB od Troponiny widać wyraźną granicę między pacjentami z zawałem serca i bez. Widać, że pacjenci z zawałem serca mają wyższe wartości obu cech. Może nam to sugerować że są to cechy, które mogą być przydatne w modelu.
 
 ## Model
 
