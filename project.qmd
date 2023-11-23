@@ -21,7 +21,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -133,12 +133,24 @@ df_sum
 # Group data into 5-year intervals
 df_sum$AgeGroup <- cut(df_sum$Age, breaks = seq(0, max(df_sum$Age) + 5, by = 5), labels = FALSE)
 
+df_pop <- df_sum %>% 
+  mutate(AgeGroup = ceiling((Age-9)/5)) %>% 
+  mutate(AgeLowerLimit = 10 + 5*(AgeGroup-1)) %>% 
+  group_by(AgeGroup) %>% 
+  mutate(Population = n())
+
+df_pop$Population <- ifelse(df_pop$Gender == 0, -df_pop$Population, df_pop$Population)
+
+ggplot(df_pop, aes(x = Population, y = factor(AgeLowerLimit), fill = Gender)) + geom_col()
+
+
+
 # Summarize data within age intervals
 df_smooth <- df_sum %>%
   group_by(AgeGroup, Gender) %>%
   summarise(sum_neg_count = sum(neg_count))
 
-ggplot(df_smooth, aes(x = AgeGroup, y = sum_neg_count, fill = factor(Gender))) + 
+ggplot(df_sum, aes(x = Age, y = neg_count, fill = factor(Gender))) + 
   geom_bar(stat = "identity", position = "identity") + 
   scale_y_continuous(labels = abs, breaks = seq(-max(df_sum$count), max(df_sum$count), by = 1000)) + 
   labs(x = "Wiek", y = "Liczba") + 
