@@ -40,6 +40,7 @@
 -   [x] dopisać że w regresji logistycznej tylko dwie zmienne są znaczące statystycznie (age i gender), ale one nie są w stanie wystarczająco dobrze wytłumaczyć czy ktoś ma zawał serca
 
 -   [ ] napisac odpowiedzi na pytania badawcze
+-   [ ] spróbować standaryzacji zmiennych
 
 chwilowo: - do corrplotow dodac result
 
