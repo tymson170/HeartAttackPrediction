@@ -38,7 +38,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 
 -   Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie (wiek, płeć, tętno, ciśnienie krwi, poziom cukru we krwi, CK-MB, troponina), przewiduje czy miał on zawał serca.
 
--   Dokonanie segmentacji pacjentów, aby zidentyfikować grupy pacjentów o podobnym ryzyku wystąpienia zawału serca.
+-   Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
 
 -   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
@@ -244,6 +244,11 @@ Na powyższym wykresie zależności CK.MB od Troponiny widać wyraźną granicę
 ## Model
 
 ### Wybór modelu - wypisac ktory moze byc najlepszy
+Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać ze sobą 3 modele: 
+- drzewo decyzyjne z wszystkimi parametrami,
+- 
+- drzewo decyzyjne z parametrami dobranymi przez nas,
+- las losowy z parametrami dobranymi przez nas.
 
 -   wypisać jakich modeli próbowaliśmy użyć
 -   wypisać jakie parametry mieliśmy do dyspozycji
@@ -251,37 +256,11 @@ Na powyższym wykresie zależności CK.MB od Troponiny widać wyraźną granicę
 -   wypisać jakie parametry odrzuciliśmy i dlaczego
 -   wypisać jakie parametry byłyby przydatne, gdybyśmy były w zbiorze
 
-### stworzenie modelu
 
--   kod dot. stworzenia modelu drzewa decyzyjnego
-
-### trening modelu
-
-### testowanie modelu
-
-### Podsumowanie efektywności modelu / jego przydatności
-
--   apropo ad3 - Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
-
-## Odpowiedź na pytania badawcze i podsumowanie
-
-Wykrycie obserwacji odstających:
-
-```{r}
-names(df)
-zmienne <- c("Age", "Diastolic.blood.pressure")
-# identify_outliers(df["Troponin"])
-
-```
-
-```{r}
-```
+#### Modele z wszystkimi zmiennymi
+##### Model regresji logistyczna
 
 GLM założenia: - Homogeneity of variance - levene test - Normality of residuals - shapiro-wilk
-
-```{r}
-tail(df[df$CK.MB>=300, ])
-```
 
 ```{r}
 sample <- sample(c(TRUE, FALSE), nrow(df), replace=TRUE, prob=c(0.7,0.3))
@@ -299,20 +278,9 @@ pred[probs > .5] <- 1
 table(pred, test$Result)
 ```
 
-Dalex - paczka do wyjasniania modelu
+##### Model drzewa decyzyjnego
 
-```{r}
-#explainer <- explain(model, data = test[-9], y = test[9])
-#explainer %>% model_performance()
-
-#explainer %>% feature_importance() %>% plot()
-#explainer %>% model_performance()  %>% plot()
-
-```
-
-## Model drzewa decyzyjnego
-
-### Użycie cross validation do trenowania modelu
+##### Użycie cross validation do trenowania modelu
 
 Podział zbioru danych (90% dane treningowe i 10% dane testowe)
 
@@ -343,50 +311,14 @@ model_test <- as.data.frame(model_test)
 table(Rzeczywistość=test$Result, Przewidziano=model_test[,'model_test'])
 ```
 
-### Używając domyślej funkcji rpart do trenowania drzewa decyzyjnego
-
-Podział zbioru na treningowy i testowy
-
-```{r}
-podzial <- createDataPartition(y = df$Result, 
-                               times = 1, 
-                               p = 0.7, 
-                               list = F)
-
-train <- df[podzial, ]
-test <- df[-podzial, ]
-test %>% dim()
-model_test$Result %>% head()
-```
-
-Trenowanie modelu
-
-```{r}
-model <- rpart(Result ~ ., method = "class", data = train)
-
-fancyRpartPlot(model, caption = "")
-```
-
-Testowanie dokładności modelu na zbiorze testowym
-
-```{r}
-model_test <- predict(model, test)
-model_test <- as.data.frame(model_test)
-model_test <- model_test %>% mutate(Result = ifelse(`0` >= .5, 0, 1))
-
-model_test$Result %>% length()
-
-table(test$Result, model_test$Result)
-```
-
-## Modele bez zmiennych CK.MB i Troponin
+#### Modele bez zmiennych CK.MB i Troponin
 
 ```{r}
 df2 <- df %>% 
   select(Age, Gender, `Heart Rate`, Systolic.blood.pressure, Diastolic.blood.pressure, Blood.sugar, Result)
 ```
 
-### Drzewo decyzyjne
+##### Drzewo decyzyjne
 
 ```{r}
 podzial2 <- createDataPartition(y = df2$Result, 
@@ -415,7 +347,7 @@ tab <- table(test2$Result, model_test2$Result)
 (tab[1, 1] + tab[2, 2])/394*100
 ```
 
-### Regresja logistyczna
+##### Regresja logistyczna
 
 ```{r}
 model3 <- glm(Result~., family = 'binomial', data = df2)
@@ -427,6 +359,7 @@ pred <- rep(0, length(probs))
 pred[probs > .5] <- 1
 table(pred, test2$Result)
 
+#po co?
 explainer2 <- explain(model3, data = test2[-7], y = test[7])
 explainer2 %>% model_performance()
 
@@ -434,3 +367,9 @@ explainer2 %>% feature_importance() %>% plot()
 ```
 
 W modelu regresji logistycznej tylko dwie zmienne są statystycznie istotne (age i gender), ale nie są one wytłumaczyć czy ktoś ma zawał serca tak dobrze jak w modelu drzewa decyzyjnego.
+
+### Podsumowanie efektywności modelu / jego przydatności
+
+-   apropo ad3 - Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
+
+## Odpowiedź na pytania badawcze i podsumowanie
