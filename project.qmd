@@ -1,7 +1,10 @@
 ---
-title: "Heart Attact"
+title: "Analiza zbioru danych pacjentów podejrzewających u siebie zawał serca"
 author: "Tymoteusz Romanowicz, Patryk Tokarski"
-format: html
+format: 
+  html: 
+    self-contained: true
+    toc: true
 editor: visual
 embed-resources: true
 execute: 
@@ -12,7 +15,7 @@ editor_options:
 
 ## Źródło danych
 
-### Zawartość zbioru:
+### Zawartość zbioru
 
 Dane do zbioru były zbierane podczas transportu karetką do szpitala pacjentów, którzy podejrzewali u siebie obecność zawału serca. Zawał mięśnia sercowego, potocznie zwany atakiem serca to martwica mięśnia sercowego spowodowana jego niedokrwieniem wskutek zamknięcia tętnicy wieńcowej doprowadzającej krew do serca. W Europie choroby układu krążenia są najczęstszą przyczyną zgonów. Z powodu schorzeń sercowo-naczyniowych w tym zawału mięśnia sercowego, umiera dwa razy więcej osób niż z powodu chorób nowotworowych. Zbiór danych zawiera 1319 obserwacji i 9 cech, z czego jedna odnosi się do obecności ataku serca.
 
@@ -21,7 +24,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|----------------------|--------------------------------------------------|
+|------------------------|------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -62,6 +65,7 @@ library(dplyr)
 library(caret)
 library(rpart)
 library(rattle)
+library(apyramid)
 ```
 
 ```{r}
@@ -88,9 +92,10 @@ df$Result <- as.factor(df$Result)
 
 df %>% get_summary_stats(show = c("min", "median","mean", "sd", "max")) %>% select(-n) %>%  pander()
 ```
-Zmienna Heart Rate zawiera watości maksymalne 1111, które są błędem. Sprawdzimy dokładniej tę zmienną.
 
-```{r}
+Zmienna Heart Rate zawiera watości maksymalne 1111, które są błędem. Sprawdzimy dokładniej tę zmienną pod kątem wartości odstających.
+
+```{r echo=FALSE}
 identify_outliers(df['Heart Rate']) %>% 
   as.data.frame() %>% 
   filter(is.extreme == TRUE) %>% 
@@ -103,9 +108,9 @@ Występują trzy obserwacje, w których tętno wynosi 1111. Normalne tętno wyno
 
 ## Opis zbioru
 
-#### Cechy jakościowe:
+#### Cechy jakościowe
 
-```{r}
+```{r echo=FALSE}
 
 df2 <- df %>% select(Result, Gender)
 levels(df2$Result) <- c("Positive", "Negative")
@@ -115,64 +120,34 @@ df2 %>% summary() %>% pander()
 
 W zbiorze jest 1316 obserwacji. Cech jakościowych jest dwie. Osób z zawałem serca jest 807, natomiast 509 ma wynik negatywny. Kobiet w zbiorze jest 447, a mężczyzn 869.
 
-#### Cechy ilościowe:
+#### Cechy ilościowe
 
-```{r}
+```{r echo=FALSE}
 df %>% get_summary_stats(show = c("min", "median","mean", "sd", "max")) %>% select(-n) %>%  pander()
 ```
+
 Zbiór danych przedstawia zróżnicowany zakres wskaźników medycznych, odzwierciedlających parametry związane ze zdrowiem poszczególnych osób. Wiek waha się od 14 do 103 lat, co wskazuje na szeroki rozkład wiekowy. Pomiary tętna i ciśnienia krwi wykazują typowe wartości, z umiarkowaną zmiennością. W szczególności poziom cukru we krwi wykazuje znaczną zmienność, ze średnią 146,7 i znacznym odchyleniem standardowym 74,98. Markery CK.MB i Troponina, związane ze zdrowiem serca, wykazują znaczną zmienność, szczególnie w przypadku CK.MB, gdzie średnia jest znacznie wyższa niż mediana, co sugeruje potencjalną skośność. Te spostrzeżenia podkreślają znaczenie zbadania charakterystyki rozkładu każdej zmiennej dla lepszego zrozumienia zbioru danych.
 
 ## Wizualizacja
 
-Piramida wieku
+#### Piramida wieku
 
-```{r}
-df_sum <- df %>% 
-  group_by(Age, Gender) %>% 
-  summarise(count = n()) %>% 
-  ungroup()
+```{r echo=FALSE}
+labs <- c(paste(seq(0, 100, by = 5), seq(0 + 5 - 1, 105 - 1, by = 5),
+                sep = "-"))
+dfpyr <- df
+dfpyr$AgeGroup <- cut(df$Age, breaks = c(seq(0, 100, by = 5), 105), labels = labs, right = FALSE)
 
-df_sum$neg_count <- ifelse(df_sum$Gender == 0, -df_sum$count, df_sum$count)
-df_sum
-
-# Group data into 5-year intervals
-df_sum$AgeGroup <- cut(df_sum$Age, breaks = seq(0, max(df_sum$Age) + 5, by = 5), labels = FALSE)
-
-age_breaks <- seq(14, 105, 3)
-df_sum$AgeGroup <- cut(df_sum$Age, breaks = age_breaks, labels = c(1:30), include.lowest = TRUE)
-
-df_sum$AgeGroup <- as.numeric(df_sum$AgeGroup)
-
-
-df_pop <- df_sum %>% 
-  mutate(AgeLowerLimit = 14 + 3*(AgeGroup-1)) %>% 
-  group_by(AgeGroup) %>% 
-  mutate(Population = n())
-
-df_pop$Population <- ifelse(df_pop$Gender == 0, -df_pop$Population, df_pop$Population)
-
-ggplot(df_pop, aes(x = Population, y = factor(AgeLowerLimit), fill = Gender)) + geom_col()
-
-
-
-# Summarize data within age intervals
-df_smooth <- df_sum %>%
-  group_by(AgeGroup, Gender) %>%
-  summarise(sum_neg_count = sum(neg_count))
-
-ggplot(df_sum, aes(x = Age, y = neg_count, fill = factor(Gender))) + 
-  geom_bar(stat = "identity", position = "identity") + 
-  scale_y_continuous(labels = abs, breaks = seq(-max(df_sum$count), max(df_sum$count), by = 1000)) + 
-  labs(x = "Wiek", y = "Liczba") + 
-  scale_fill_manual(values = c("0" = "#f8766d", "1" = "#00bfc4")) + 
-  theme_minimal() + coord_flip() + guides(fill = "none")
-
-# todo: zrobić ładniej 
+pyr <- age_pyramid(dfpyr, AgeGroup, split_by = Gender, proportional = TRUE)
+pyr + scale_fill_manual(values = c("#f8766d", "#00bfc4"), 
+                        labels = c("0" = "kobiety", "1" = "mężczyźni")) +
+  theme(legend.position = "right") + 
+  labs(x = "Grupy wiekowe", y = "Część całkowitej liczebności", fill = "Płeć")
 ```
 
-
 #### Histogram wieku z podziałem na płeć oraz obecność ataku serca
-```{r}
+
+```{r echo=FALSE}
 age_distr <- df %>% 
   mutate(Gender2 = ifelse(Gender == "0", "female", "male")) %>% 
   mutate(Result2 = ifelse(Result == "0", "negative", "positive"))
@@ -183,11 +158,12 @@ ggplot(age_distr, aes(x = Age, fill = Gender2)) +
   facet_grid(Gender2 ~ Result2) +
   labs(title = "Age Distribution by Gender and Result", x = "Age", y = "Frequency") + guides(fill = "none")
 ```
- Wyraźnie widać, że rozkład mężczyzn z atakiem serca (lewy dolny histogram) przypomina rozkład normalny. Natomiast pozostałe 3 wykresy są do siebie podobne i także przypominają rozkład normalny, tylko z o wiele mniejszą kurtozą. Możemy zauważyć, że różnica między brakiem, a istnieniem zawału serca jest o wiele większa wśród mężczyzn. Naszą hipotezę sprawdzimy testem proporcji.
+
+Wyraźnie widać, że rozkład mężczyzn z atakiem serca (lewy dolny histogram) przypomina rozkład normalny. Natomiast pozostałe 3 wykresy są do siebie podobne i także przypominają rozkład normalny, tylko z o wiele mniejszą kurtozą. Możemy zauważyć, że różnica między brakiem, a istnieniem zawału serca jest o wiele większa wśród mężczyzn. Naszą hipotezę sprawdzimy testem proporcji.
 
 #### Test proporcji dla obecności ataku serca ze względu na płeć
-Hipoteza zerowa zakłada, że procent pozytywnych przypadków ataku serca jest taki sam dla obu płci. 
-Hipoteza alternatywna zakłada, że procent pozytywnych przypadków ataku serca jest różny dla obu płci.
+
+Hipoteza zerowa zakłada, że procent pozytywnych przypadków ataku serca jest taki sam dla obu płci. Hipoteza alternatywna zakłada, że procent pozytywnych przypadków ataku serca jest różny dla obu płci.
 
 ```{r}
 # Tworzenie tablicy przestawnej
@@ -203,25 +179,30 @@ data.frame("Proportion test"=round(result_prop_test$p.value,3),
 
 Na podstawie testu chi-kwadrat jak i test proporcjonalności odrzucamy hipotezę o rowności procenta pozytywnych przypadków ataku serca ze względu na płeć. Wynika z tego, że większą szansę na atak serca mają mężczyźni.
 
-####  Wykres korelacji cech
+#### Wykres korelacji cech
 
-##### Dla przypadkow z atakiem serca
-```{r warning=FALSE}
+##### Dla przypadków z atakiem serca
+
+```{r warning=FALSE, echo=FALSE}
 
 df %>% filter(Result == 1) %>% 
   select(c(-Result,-Gender)) %>%
   chart.Correlation()
 ```
-##### Dla przypadkow bez ataku serca
-```{r warning=FALSE}
+
+##### Dla przypadków bez ataku serca
+
+```{r warning=FALSE, echo=FALSE}
 df %>% filter(Result == 0) %>% 
   select(c(-Result,-Gender)) %>%
   chart.Correlation()
 ```
+
 Powyższe wykresy są bardzo do siebie podobne. Jedyną wyraźną cechą różniącą je jest cecha CK.MB, która dla zdrowych pacjentów jest w zakresie 0-7, a dla osób z zawałem serca od 0-300.
 
 #### Histogram dla każdej cechy, z wizualnym podziałem na wynik
-```{r}
+
+```{r echo=FALSE}
 df %>% 
   pivot_longer(cols = c(1, 3, 4, 5, 6, 7, 8), names_to = "variable", values_to = "value") %>% 
   ggplot(aes(x = value, fill = Result)) +
@@ -231,24 +212,21 @@ df %>%
   scale_fill_discrete(labels=c("Negative", "Positive"))
 ```
 
-
 ### Wykres zależności CK.MB od Troponiny z podziałem na pacjentów z zawałem i bez
 
-```{r}
+```{r echo=FALSE}
 p <- ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point(alpha = 0.5) + scale_color_manual(values = c("1" = "red", "0" = "blue")) + labs(x = "CK.MB", y = "Troponina (skala logarytmiczna)", col = "Wynik") + theme_minimal() + scale_y_log10() + scale_x_log10()
 
 ggplotly(p)
 ```
+
 Na powyższym wykresie zależności CK.MB od Troponiny widać wyraźną granicę między pacjentami z zawałem serca i bez. Widać, że pacjenci z zawałem serca mają wyższe wartości obu cech. Może nam to sugerować że są to cechy, które mogą być przydatne w modelu.
 
 ## Model
 
 ### Wybór modelu - wypisac ktory moze byc najlepszy
-Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać ze sobą 3 modele: 
-- drzewo decyzyjne z wszystkimi parametrami,
-- 
-- drzewo decyzyjne z parametrami dobranymi przez nas,
-- las losowy z parametrami dobranymi przez nas.
+
+Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać ze sobą 3 modele: - drzewo decyzyjne z wszystkimi parametrami, - - drzewo decyzyjne z parametrami dobranymi przez nas, - las losowy z parametrami dobranymi przez nas.
 
 -   wypisać jakich modeli próbowaliśmy użyć
 -   wypisać jakie parametry mieliśmy do dyspozycji
@@ -256,8 +234,8 @@ Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać z
 -   wypisać jakie parametry odrzuciliśmy i dlaczego
 -   wypisać jakie parametry byłyby przydatne, gdybyśmy były w zbiorze
 
-
 #### Modele z wszystkimi zmiennymi
+
 ##### Model regresji logistyczna
 
 GLM założenia: - Homogeneity of variance - levene test - Normality of residuals - shapiro-wilk
@@ -360,10 +338,10 @@ pred[probs > .5] <- 1
 table(pred, test2$Result)
 
 #po co?
-explainer2 <- explain(model3, data = test2[-7], y = test[7])
-explainer2 %>% model_performance()
-
-explainer2 %>% feature_importance() %>% plot()
+# explainer2 <- explain(model3, data = test2[-7], y = test[7])
+# explainer2 %>% model_performance()
+# 
+# explainer2 %>% feature_importance() %>% plot()
 ```
 
 W modelu regresji logistycznej tylko dwie zmienne są statystycznie istotne (age i gender), ale nie są one wytłumaczyć czy ktoś ma zawał serca tak dobrze jak w modelu drzewa decyzyjnego.
