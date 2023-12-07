@@ -39,11 +39,11 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
  
 ## Cele badawcze
 
--   Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie (wiek, płeć, tętno, ciśnienie krwi, poziom cukru we krwi, CK-MB, troponina), przewiduje czy miał on zawał serca.
+1.   Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie (wiek, płeć, tętno, ciśnienie krwi, poziom cukru we krwi, CK-MB, troponina), przewiduje czy miał on zawał serca.
 
--   Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
+2.   Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
 
--   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
+3.   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
 ## Przygotowanie zbioru, weryfikacja poprawnosci danych, brakujace wartosci
 
@@ -231,12 +231,6 @@ Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać z
 - drzewo decyzyjne z parametrami dobranymi przez nas, 
 - las losowy z parametrami dobranymi przez nas.
 
--   wypisać jakich modeli próbowaliśmy użyć
--   wypisać jakie parametry mieliśmy do dyspozycji
--   wypisać jakie parametry wybraliśmy i dlaczego
--   wypisać jakie parametry odrzuciliśmy i dlaczego
--   wypisać jakie parametry byłyby przydatne, gdybyśmy były w zbiorze
-
 #### Modele z wszystkimi zmiennymi
 
 ##### Model regresji logistyczna
@@ -354,9 +348,42 @@ table(pred, test2$Result)
 W modelu regresji logistycznej tylko dwie zmienne są statystycznie istotne (age i gender), ale nie są one wytłumaczyć czy ktoś ma zawał serca tak dobrze jak w modelu drzewa decyzyjnego.
 
 ### Podsumowanie efektywności modelu / jego przydatności
-- 
--   apropo ad3 - Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
+# todo jako tabelka ponizsze
+Regresja logistyczna ze wszystkimi zmiennymi: []%
+
+Drzewo decyzyjne ze wszystkimi zmiennymi: []%
+
+Drzewo decyzyjne bez zmiennych CK.MB i Troponin: []%
+
+Regresja logistyczna bez zmiennych CK.MB i Troponin: []%
+
+#### Wnioski
+  Okazuje się, że drzewo decyzyjne ze zmiennymi CK.MB i Troponin jest najlepszym modelem, ponieważ ma największą dokładność.
+  
+  Zaskoczeniem było dla nas to, że reszta zmiennych ma tak mały wpływ na to czy pacjent ma zawał serca.
+  
+  Jednakże, patrząc na to, czym kierują się lekarze, przy badaniu pacjenta, to właśnie wartości tych dwóch czynników są najważniejsze i decydujące o istnieniu zawału.
+  
+  Drzewo decyzyjne używając tych dwóch zmiennych jest w stanie bardzo dobrze przewidzieć czy pacjent ma zawał serca, ponieważ jak widać na wykresie zależności CK.MB od Troponiny, punkty oznaczające pacjentów z wynikiem negatywnym układają się w wyraźny prostokąt, dookoła którego są pacjenci z wynikiem pozytywnym.
+```{r}
+ggplotly(p)
+```
+  Modele stworzone bez zmiennych CK.MB i Troponiny mają o wiele gorszą dokładność. Jedyna zmienna, która w istotny sposób wpływa na wynik jest wiek, ale nie jest ona w stanie przewidzieć czy pacjent ma zawał serca tak dobrze jak w modelu z zmiennymi CK.MB i Troponin.
+  
+  Być może gdybyśmy w dostępnych danych mieli takie wartości jak:
+  - czy dana osoba pali tytoń,
+  - poziom cholesterolu,
+  - marskość wątroby,
+to moglibyśmy stworzyć lepszy model, który miałby większą dokładność.
 
 ## Odpowiedź na pytania badawcze i podsumowanie
+1.   Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie, przewiduje czy miał on zawał serca.
 
-- 
+Udało nam się stworzyć model i uzyskać wysoką dokładność. Jednak przy większej i lepszej jakości danych, model mógłby być jeszcze lepszy.
+
+2.   Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
+
+
+
+3.   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych. 
+
