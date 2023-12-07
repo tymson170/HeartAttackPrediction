@@ -25,7 +25,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|-------------------------|-----------------------------------------------|
+|-------------------------|----------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -37,14 +37,14 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 | Result                   | Obecność zawału (0 - brak zawału, 1 - zawał)                                                                   |
 
 : Cechy i ich opisy
- 
+
 ## Cele badawcze
 
-1.   Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie (wiek, płeć, tętno, ciśnienie krwi, poziom cukru we krwi, CK-MB, troponina), przewiduje czy miał on zawał serca.
+1.  Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie (wiek, płeć, tętno, ciśnienie krwi, poziom cukru we krwi, CK-MB, troponina), przewiduje czy miał on zawał serca.
 
-2.   Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
+2.  Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
 
-3.   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
+3.  Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
 ## Przygotowanie zbioru, weryfikacja poprawnosci danych, brakujace wartosci
 
@@ -67,6 +67,7 @@ library(caret)
 library(rpart)
 library(rattle)
 library(apyramid)
+library(modelsummary)
 ```
 
 ```{r}
@@ -225,22 +226,15 @@ Na powyższym wykresie zależności CK.MB od Troponiny widać wyraźną granicę
 
 ## Model
 
-### Wybór modelu 
+### Wybór modelu
 
-Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać ze sobą 3 modele: 
-- drzewo decyzyjne z wszystkimi parametrami, 
-- drzewo decyzyjne z parametrami dobranymi przez nas, 
-- las losowy z parametrami dobranymi przez nas.
+Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać ze sobą 3 modele: - drzewo decyzyjne z wszystkimi parametrami, - drzewo decyzyjne z parametrami dobranymi przez nas, - las losowy z parametrami dobranymi przez nas.
 
 #### Modele z wszystkimi zmiennymi
 
 ##### Model regresji logistyczna
 
-GLM założenia: 
-- Homogeneity of variance 
-- levene test 
-- Normality of residuals 
-- shapiro-wilk
+GLM założenia: - Homogeneity of variance - levene test - Normality of residuals - shapiro-wilk
 
 ```{r}
 sample <- sample(c(TRUE, FALSE), nrow(df), replace=TRUE, prob=c(0.7,0.3))
@@ -278,7 +272,7 @@ test <- df[-podzial, ]
 Trenowanie modelu z użyciem cross validation
 
 ```{r}
-model <- caret::train(x= train[-9], 
+model2 <- caret::train(x= train[-9], 
                       y=train[,9], 
                       method = 'rpart', 
                       trControl = trainControl(method = 'cv', number=5))
@@ -287,7 +281,7 @@ model <- caret::train(x= train[-9],
 Testowanie modelu i wyświetlenie tabeli pomyłek
 
 ```{r}
-model_test <- predict(model, test)
+model_test <- predict(model2, test)
 model_test <- as.data.frame(model_test)
 
 table2 <- table(Rzeczywistość=test$Result, Przewidziano=model_test[,'model_test'])
@@ -313,15 +307,15 @@ podzial2 <- createDataPartition(y = df2$Result,
 train2 <- df2[podzial2, ]
 test2 <- df2[-podzial2, ]
 
-model2 <- rpart(Result ~ ., method = "class", data = train2, minsplit = 100)
+model3 <- rpart(Result ~ ., method = "class", data = train2, minsplit = 100)
 
-fancyRpartPlot(model2, caption = "")
+fancyRpartPlot(model3, caption = "")
 ```
 
 Dokładność
 
 ```{r}
-model_test2 <- predict(model2, test2)
+model_test2 <- predict(model3, test2)
 model_test2 <- as.data.frame(model_test2)
 
 model_test2 <- model_test2 %>% 
@@ -335,11 +329,11 @@ tree_acc2 <- sum(diag(tab3))/sum(tab3)
 ##### Regresja logistyczna
 
 ```{r}
-model3 <- glm(Result~., family = 'binomial', data = df2)
+model4 <- glm(Result~., family = 'binomial', data = df2)
 
-summary(model3)
+summary(model4)
 
-probs <- predict(model3, newdata = test2, type = "response")
+probs <- predict(model4, newdata = test2, type = "response")
 pred <- rep(0, length(probs))
 pred[probs > .5] <- 1
 tab4 <- table(pred, test2$Result)
@@ -354,14 +348,6 @@ log_acc2 <- sum(diag(tab4))/sum(tab4)
 W modelu regresji logistycznej tylko dwie zmienne są statystycznie istotne (age i gender), ale nie są one wytłumaczyć czy ktoś ma zawał serca tak dobrze jak w modelu drzewa decyzyjnego.
 
 ### Podsumowanie efektywności modelu / jego przydatności
-# todo jako tabelka ponizsze
-Regresja logistyczna ze wszystkimi zmiennymi: []%
-
-Drzewo decyzyjne ze wszystkimi zmiennymi: []%
-
-Drzewo decyzyjne bez zmiennych CK.MB i Troponin: []%
-
-Regresja logistyczna bez zmiennych CK.MB i Troponin: []%
 
 ```{r}
 modele <- c("Drzewo decyzyjne z CK.MB i Troponin", "Drzewo decyzyjne bez CK.MB i Troponin", "Regresja logistyczna z CK.MB i Troponin", "Regresja logistyczna bez CK.MB i Troponin")
@@ -373,40 +359,42 @@ dokladnosc$Dokładność <- round(dokladnosc$Dokładność, 2)
 kable(dokladnosc)
 ```
 
+Porównanie modeli regresji logistycznej
+
+```{r}
+modelsummary(list(model, model4))
+```
 
 #### Wnioski
-  Okazuje się, że drzewo decyzyjne ze zmiennymi CK.MB i Troponin jest najlepszym modelem, ponieważ ma największą dokładność.
-  
-  Zaskoczeniem było dla nas to, że reszta zmiennych ma tak mały wpływ na to czy pacjent ma zawał serca.
-  
-  Jednakże, patrząc na to, czym kierują się lekarze, przy badaniu pacjenta, to właśnie wartości tych dwóch czynników są najważniejsze i decydujące o istnieniu zawału.
-  
-  Drzewo decyzyjne używając tych dwóch zmiennych jest w stanie bardzo dobrze przewidzieć czy pacjent ma zawał serca, ponieważ jak widać na wykresie zależności CK.MB od Troponiny, punkty oznaczające pacjentów z wynikiem negatywnym układają się w wyraźny prostokąt, dookoła którego są pacjenci z wynikiem pozytywnym.
+
+Okazuje się, że drzewo decyzyjne ze zmiennymi CK.MB i Troponin jest najlepszym modelem, ponieważ ma największą dokładność.
+
+Zaskoczeniem było dla nas to, że reszta zmiennych ma tak mały wpływ na to czy pacjent ma zawał serca.
+
+Jednakże, patrząc na to, czym kierują się lekarze, przy badaniu pacjenta, to właśnie wartości tych dwóch czynników są najważniejsze i decydujące o istnieniu zawału.
+
+Drzewo decyzyjne używając tych dwóch zmiennych jest w stanie bardzo dobrze przewidzieć czy pacjent ma zawał serca, ponieważ jak widać na wykresie zależności CK.MB od Troponiny, punkty oznaczające pacjentów z wynikiem negatywnym układają się w wyraźny prostokąt, dookoła którego są pacjenci z wynikiem pozytywnym.
+
 ```{r}
 ggplotly(p)
 ```
-  Modele stworzone bez zmiennych CK.MB i Troponiny mają o wiele gorszą dokładność. Jedyna zmienna, która w istotny sposób wpływa na wynik jest wiek, ale nie jest ona w stanie przewidzieć czy pacjent ma zawał serca tak dobrze jak w modelu z zmiennymi CK.MB i Troponin.
-  
-  Być może gdybyśmy w dostępnych danych mieli takie wartości jak:
-  - czy dana osoba pali tytoń,
-  - poziom cholesterolu,
-  - marskość wątroby,
-to moglibyśmy stworzyć lepszy model, który miałby większą dokładność.
+
+Modele stworzone bez zmiennych CK.MB i Troponiny mają o wiele gorszą dokładność. Jedyna zmienna, która w istotny sposób wpływa na wynik jest wiek, ale nie jest ona w stanie przewidzieć czy pacjent ma zawał serca tak dobrze jak w modelu z zmiennymi CK.MB i Troponin.
+
+Być może gdybyśmy w dostępnych danych mieli takie wartości jak: - czy dana osoba pali tytoń, - poziom cholesterolu, - marskość wątroby, to moglibyśmy stworzyć lepszy model, który miałby większą dokładność.
 
 ## Odpowiedź na pytania badawcze i podsumowanie
-1.   Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie, przewiduje czy miał on zawał serca.
+
+1.  Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie, przewiduje czy miał on zawał serca.
 
 Udało nam się stworzyć model i uzyskać wysoką dokładność. Jednak przy większej i lepszej jakości danych, model mógłby być jeszcze lepszy.
 
-2.   Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
+2.  Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
 
-Lekarze stwierdzając świeży zawał mięśnia sercowego, stosują wartość odcięcia (czyli wartość powyżej 99 centyla zakresu referencyjnego).
-Dla troponiny ta wartość wacha się od $0,01 \mu g/l$ do $0,08 \mu g/l$ w zależności od producenta testu.
-W naszym modelu wartość, od której decydujemy czy ktoś ma zawał dla troponiny wynosi `r `. (~0.015)
-# TODO wpisac wartosc z modelu i dopisac jak sie ma do stosowanego przez lekarzy i dac bibliografie do tego.
+Lekarze stwierdzając świeży zawał mięśnia sercowego, stosują wartość odcięcia (czyli wartość powyżej 99 centyla zakresu referencyjnego). Dla troponiny ta wartość wacha się od $0,01 \mu g/l$ do $0,08 \mu g/l$ w zależności od producenta testu. W naszym modelu wartość, od której decydujemy czy ktoś ma zawał dla troponiny wynosi `r`. (\~0.015) \# TODO wpisac wartosc z modelu i dopisac jak sie ma do stosowanego przez lekarzy i dac bibliografie do tego.
 
-CKMB ~6.5 (w sieci od 5 (znalesc zrodlo))
+CKMB \~6.5 (w sieci od 5 (znalesc zrodlo))
 
-3.   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych. 
+3.  Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
 Wizualizacja danych pozwoliła nam zauważyć, że ...
