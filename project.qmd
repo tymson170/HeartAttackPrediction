@@ -5,6 +5,7 @@ format:
   html: 
     self-contained: true
     toc: true
+    toc-title: Spis treści
 editor: visual
 embed-resources: true
 execute: 
@@ -254,7 +255,9 @@ summary(model)
 probs <- predict(model, newdata = test, type = "response")
 pred <- rep(0, length(probs))
 pred[probs > .5] <- 1
-table(pred, test$Result)
+table1 <- table(pred, test$Result)
+
+log_acc1 <- sum(diag(table1))/sum(table1)
 ```
 
 ##### Model drzewa decyzyjnego
@@ -287,7 +290,9 @@ Testowanie modelu i wyświetlenie tabeli pomyłek
 model_test <- predict(model, test)
 model_test <- as.data.frame(model_test)
 
-table(Rzeczywistość=test$Result, Przewidziano=model_test[,'model_test'])
+table2 <- table(Rzeczywistość=test$Result, Przewidziano=model_test[,'model_test'])
+
+tree_acc1 <- sum(diag(table2))/sum(table2)
 ```
 
 #### Modele bez zmiennych CK.MB i Troponin
@@ -322,8 +327,9 @@ model_test2 <- as.data.frame(model_test2)
 model_test2 <- model_test2 %>% 
   mutate(Result = ifelse(`0` >= .5, 0, 1))
 
-tab <- table(test2$Result, model_test2$Result)
-(tab[1, 1] + tab[2, 2])/394*100
+tab3 <- table(test2$Result, model_test2$Result)
+tab3 <- as.matrix(tab3)
+tree_acc2 <- sum(diag(tab3))/sum(tab3)
 ```
 
 ##### Regresja logistyczna
@@ -336,8 +342,8 @@ summary(model3)
 probs <- predict(model3, newdata = test2, type = "response")
 pred <- rep(0, length(probs))
 pred[probs > .5] <- 1
-table(pred, test2$Result)
-
+tab4 <- table(pred, test2$Result)
+log_acc2 <- sum(diag(tab4))/sum(tab4)
 #po co?
 # explainer2 <- explain(model3, data = test2[-7], y = test[7])
 # explainer2 %>% model_performance()
@@ -356,6 +362,17 @@ Drzewo decyzyjne ze wszystkimi zmiennymi: []%
 Drzewo decyzyjne bez zmiennych CK.MB i Troponin: []%
 
 Regresja logistyczna bez zmiennych CK.MB i Troponin: []%
+
+```{r}
+modele <- c("Drzewo decyzyjne z CK.MB i Troponin", "Drzewo decyzyjne bez CK.MB i Troponin", "Regresja logistyczna z CK.MB i Troponin", "Regresja logistyczna bez CK.MB i Troponin")
+dokladnosci <- c(tree_acc1, tree_acc2, log_acc1, log_acc2)
+dokladnosc <- data.frame(modele, dokladnosci)
+colnames(dokladnosc) <- c("Model", "Dokładność")
+dokladnosc$Dokładność <- round(dokladnosc$Dokładność, 2)
+
+kable(dokladnosc)
+```
+
 
 #### Wnioski
   Okazuje się, że drzewo decyzyjne ze zmiennymi CK.MB i Troponin jest najlepszym modelem, ponieważ ma największą dokładność.
