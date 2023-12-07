@@ -400,7 +400,13 @@ Udało nam się stworzyć model i uzyskać wysoką dokładność. Jednak przy wi
 
 2.   Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
 
+Lekarze stwierdzając świeży zawał mięśnia sercowego, stosują wartość odcięcia (czyli wartość powyżej 99 centyla zakresu referencyjnego).
+Dla troponiny ta wartość wacha się od $0,01 \mu g/l$ do $0,08 \mu g/l$ w zależności od producenta testu.
+W naszym modelu wartość, od której decydujemy czy ktoś ma zawał dla troponiny wynosi `r `. (~0.015)
+# TODO wpisac wartosc z modelu i dopisac jak sie ma do stosowanego przez lekarzy i dac bibliografie do tego.
 
+CKMB ~6.5 (w sieci od 5 (znalesc zrodlo))
 
 3.   Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych. 
 
+Wizualizacja danych pozwoliła nam zauważyć, że ...
