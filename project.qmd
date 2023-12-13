@@ -12,20 +12,21 @@ execute:
   warning: false
 editor_options: 
   chunk_output_type: console
+bibliography: references.bib
 ---
 
 ## Źródło danych
 
 ### Zawartość zbioru
 
-Dane do zbioru były zbierane podczas transportu karetką do szpitala pacjentów, którzy podejrzewali u siebie obecność zawału serca. Zawał mięśnia sercowego, potocznie zwany atakiem serca to martwica mięśnia sercowego spowodowana jego niedokrwieniem wskutek zamknięcia tętnicy wieńcowej doprowadzającej krew do serca. W Europie choroby układu krążenia są najczęstszą przyczyną zgonów. Z powodu schorzeń sercowo-naczyniowych w tym zawału mięśnia sercowego, umiera dwa razy więcej osób niż z powodu chorób nowotworowych. Zbiór danych zawiera 1319 obserwacji i 9 cech, z czego jedna odnosi się do obecności ataku serca.
+Dane do zbioru były zbierane podczas transportu karetką do szpitala pacjentów, którzy podejrzewali u siebie obecność zawału serca. Zawał mięśnia sercowego, potocznie zwany atakiem serca to martwica mięśnia sercowego spowodowana jego niedokrwieniem wskutek zamknięcia tętnicy wieńcowej doprowadzającej krew do serca. W Europie choroby układu krążenia są najczęstszą przyczyną zgonów. Z powodu schorzeń sercowo-naczyniowych w tym zawału mięśnia sercowego, umiera dwa razy więcej osób niż z powodu chorób nowotworowych.[@eurostat] Zbiór danych zawiera 1319 obserwacji i 9 cech, z czego jedna odnosi się do obecności ataku serca.
 
 Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tętnicze, poziom cukru we krwi, CK-MB (kineaza kreatynowa) i troponina reprezentują pola wejściowe, podczas gdy pole wyjściowe odnosi się do obecności zawału serca, który jest podzielone na dwie kategorie (0 i 1); "0" odnosi się do braku zawału serca, podczas gdy "1" odnosi się do obecności zawału serca.
 
 ### Przedstawienie zmiennych: opis jakie są i co znaczą
 
 | Cecha                    | Opis                                                                                                           |
-|-------------------------|----------------------------------------------|
+|--------------------------|----------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -232,7 +233,7 @@ Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać z
 
 #### Modele z wszystkimi zmiennymi
 
-##### Model regresji logistyczna
+##### Model regresji logistycznej
 
 GLM założenia: - Homogeneity of variance - levene test - Normality of residuals - shapiro-wilk
 
@@ -287,6 +288,11 @@ model_test <- as.data.frame(model_test)
 table2 <- table(Rzeczywistość=test$Result, Przewidziano=model_test[,'model_test'])
 
 tree_acc1 <- sum(diag(table2))/sum(table2)
+table2
+```
+
+```{r}
+fancyRpartPlot(model2$finalModel, caption='')
 ```
 
 #### Modele bez zmiennych CK.MB i Troponin
@@ -381,9 +387,17 @@ ggplotly(p)
 
 Modele stworzone bez zmiennych CK.MB i Troponiny mają o wiele gorszą dokładność. Jedyna zmienna, która w istotny sposób wpływa na wynik jest wiek, ale nie jest ona w stanie przewidzieć czy pacjent ma zawał serca tak dobrze jak w modelu z zmiennymi CK.MB i Troponin.
 
-Być może gdybyśmy w dostępnych danych mieli takie wartości jak: - czy dana osoba pali tytoń, - poziom cholesterolu, - marskość wątroby, to moglibyśmy stworzyć lepszy model, który miałby większą dokładność.
+Być może gdybyśmy w dostępnych danych mieli takie wartości jak:
 
-## Odpowiedź na pytania badawcze i podsumowanie
+-   czy dana osoba pali tytoń,
+
+-   poziom cholesterolu,
+
+-   marskość wątroby,
+
+to moglibyśmy stworzyć lepszy model, który miałby większą dokładność.
+
+## Odpowiedź na pytania badawcze i 
 
 1.  Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie, przewiduje czy miał on zawał serca.
 
@@ -391,10 +405,12 @@ Udało nam się stworzyć model i uzyskać wysoką dokładność. Jednak przy wi
 
 2.  Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
 
-Lekarze stwierdzając świeży zawał mięśnia sercowego, stosują wartość odcięcia (czyli wartość powyżej 99 centyla zakresu referencyjnego). Dla troponiny ta wartość wacha się od $0,01 \mu g/l$ do $0,08 \mu g/l$ w zależności od producenta testu. W naszym modelu wartość, od której decydujemy czy ktoś ma zawał dla troponiny wynosi `r`. (\~0.015) \# TODO wpisac wartosc z modelu i dopisac jak sie ma do stosowanego przez lekarzy i dac bibliografie do tego.
-
-CKMB \~6.5 (w sieci od 5 (znalesc zrodlo))
+Lekarze stwierdzając świeży zawał mięśnia sercowego, stosują wartość odcięcia (czyli wartość powyżej 99 centyla zakresu referencyjnego). Dla troponiny ta wartość wacha się od $0,01 \mu g/l$ do $0,08 \mu g/l$ w zależności od producenta testu.[@jaffe2006] W naszym modelu wartość, od której decydujemy czy ktoś ma zawał dla troponiny wynosi $0,015$, a dla CK.MB $6,3$.
 
 3.  Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
-Wizualizacja danych pozwoliła nam zauważyć, że ...
+Wizualizacja danych pozwoliła nam zauważyć błędy w danych, po pozbyciu się których, otrzymaliśmy lepsze jakosciowo dane. Dostrzegliśmy także zmienne, które mogły mieć dużą moc predykcyjną w stworzonym później modelu. Dowiedzieliśmy się także, że najwięszą grupą w zbiorze są mężczyźni z zawałem serca, a najmniej liczna jest grupa kobiet bez zawału serca.
+
+## Podsumowanie
+
+...
