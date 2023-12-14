@@ -40,7 +40,28 @@
 -   [x] dopisać że w regresji logistycznej tylko dwie zmienne są znaczące statystycznie (age i gender), ale one nie są w stanie wystarczająco dobrze wytłumaczyć czy ktoś ma zawał serca
 
 -   [ ] napisac odpowiedzi na pytania badawcze
+
 -   [ ] spróbować standaryzacji zmiennych
+
+-   [ ] nie ma brakow danych - dopisac na poczatku
+
+-   [ ] cechy jakosciowe - odzielic kolumny / mienic funkcje
+
+-   [ ] opis do piramidy wieku
+
+-   [ ] pod corrplotem spomniec o istotnej i niemalej korelacji cisnienia
+
+-   [ ] zmienic opis z model ze wsyzskimi na model z ckmb i troponin
+
+-   [ ] sprawdzic zatozenia GLM
+
+-   [ ] 80% treningowy
+
+-   [ ] confusion matrix - zrobic templatke
+
+-   [ ] poprawic porownanie modeli regresji logistycznych
+
+-   [ ] klastrowanie (sugestia prowadzącej)
 
 chwilowo: - do corrplotow dodac result
 
