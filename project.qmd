@@ -1,6 +1,8 @@
 ---
 title: "Analiza zbioru danych pacjentów podejrzewających u siebie zawał serca"
-author: "Tymoteusz Romanowicz, Patryk Tokarski"
+author: 
+  - Tymoteusz Romanowicz
+  - Patryk Tokarski
 format: 
   html: 
     self-contained: true
@@ -23,10 +25,10 @@ Dane do zbioru były zbierane podczas transportu karetką do szpitala pacjentów
 
 Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tętnicze, poziom cukru we krwi, CK-MB (kineaza kreatynowa) i troponina reprezentują pola wejściowe, podczas gdy pole wyjściowe odnosi się do obecności zawału serca, który jest podzielone na dwie kategorie (0 i 1); "0" odnosi się do braku zawału serca, podczas gdy "1" odnosi się do obecności zawału serca.
 
-### Przedstawienie zmiennych: opis jakie są i co znaczą
+### Przedstawienie zmiennych
 
 | Cecha                    | Opis                                                                                                           |
-|--------------------------|----------------------------------------------|
+|--------------------------|---------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -397,7 +399,7 @@ Być może gdybyśmy w dostępnych danych mieli takie wartości jak:
 
 to moglibyśmy stworzyć lepszy model, który miałby większą dokładność.
 
-## Odpowiedź na pytania badawcze i 
+## Odpowiedź na pytania badawcze
 
 1.  Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie, przewiduje czy miał on zawał serca.
 
