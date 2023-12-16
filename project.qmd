@@ -28,7 +28,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych
 
 | Cecha                    | Opis                                                                                                           |
-|--------------------------|---------------------------------------------|
+|---------------------------|---------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -71,6 +71,7 @@ library(rpart)
 library(rattle)
 library(apyramid)
 library(modelsummary)
+library(cvms)
 ```
 
 ```{r}
@@ -87,6 +88,13 @@ df <- df %>% rename(
   "Result" = class
 )
 ```
+
+```{r}
+nas <- colSums(is.na(df))
+kable(nas, col.names = "Liczba braków danych")
+```
+
+W żadnej z kolumn nie występują braki danych.
 
 ```{r}
 # zmiana cech na factor
@@ -150,6 +158,8 @@ pyr + scale_fill_manual(values = c("#f8766d", "#00bfc4"),
   labs(x = "Grupy wiekowe", y = "Część całkowitej liczebności", fill = "Płeć")
 ```
 
+Na powyższym wykresie widać, że rozkłady wieku wyglądają podobnie zarówno dla mężczyzn jak i kobiet, jednak rozkład wieku wśród płci żeńskiej charakteryzuje się znacznie mniejszą kurtozą. Najwięcej pacjentów znajduje się w przedziale wiekowym 60-64, co stanowi około 18% całego zbioru. Widzimy też, że liczebność mężczyzn jest zdecydowanie większa w przedziałach z środkowego obszaru, natomiast liczebość kobiet zaczyna minimalnie przeważać wśród osób najmłodszych i najstarszych.
+
 #### Histogram wieku z podziałem na płeć oraz obecność ataku serca
 
 ```{r echo=FALSE}
@@ -203,7 +213,7 @@ df %>% filter(Result == 0) %>%
   chart.Correlation()
 ```
 
-Powyższe wykresy są bardzo do siebie podobne. Jedyną wyraźną cechą różniącą je jest cecha CK.MB, która dla zdrowych pacjentów jest w zakresie 0-7, a dla osób z zawałem serca od 0-300.
+Powyższe wykresy są bardzo do siebie podobne. Jedyną wyraźną cechą różniącą je jest cecha CK.MB, która dla zdrowych pacjentów jest w zakresie 0-7, a dla osób z zawałem serca od 0-300. Warto również zwrócić uwagę na to, że stosunkowo silna korelacja występuje jedynie pomiędzy zmienną przechowującą ciśnienie nadkurczowe oraz rozkurczowe, co ma sens, ponieważ w praktyce miary te również są ze sobą powiązane. Wyklucza to jednak możliwość użycia obydwu zmiennych w przyszłych modelach.
 
 #### Histogram dla każdej cechy, z wizualnym podziałem na wynik
 
@@ -239,6 +249,8 @@ Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać z
 
 GLM założenia: - Homogeneity of variance - levene test - Normality of residuals - shapiro-wilk
 
+
+
 ```{r}
 sample <- sample(c(TRUE, FALSE), nrow(df), replace=TRUE, prob=c(0.7,0.3))
 test   <- df[!sample, ]
@@ -254,6 +266,12 @@ pred <- rep(0, length(probs))
 pred[probs > .5] <- 1
 table1 <- table(pred, test$Result)
 
+cfm1 <- as.data.frame(table1)
+plot_confusion_matrix(cfm1, 
+                      target_col = "Var2", 
+                      prediction_col = "pred", 
+                      counts_col = "Freq")
+
 log_acc1 <- sum(diag(table1))/sum(table1)
 ```
 
@@ -261,12 +279,12 @@ log_acc1 <- sum(diag(table1))/sum(table1)
 
 ##### Użycie cross validation do trenowania modelu
 
-Podział zbioru danych (90% dane treningowe i 10% dane testowe)
+Podział zbioru danych (80% dane treningowe i 10% dane testowe)
 
 ```{r}
 podzial <- createDataPartition(y = df$Result, 
                                times = 1, 
-                               p = 0.9, 
+                               p = 0.8, 
                                list = F)
 train <- df[podzial, ]
 test <- df[-podzial, ]
@@ -287,10 +305,15 @@ Testowanie modelu i wyświetlenie tabeli pomyłek
 model_test <- predict(model2, test)
 model_test <- as.data.frame(model_test)
 
-table2 <- table(Rzeczywistość=test$Result, Przewidziano=model_test[,'model_test'])
+table2 <- table(test$Result, model_test[,'model_test'])
 
 tree_acc1 <- sum(diag(table2))/sum(table2)
-table2
+
+cfm2 <- as.data.frame(table2)
+plot_confusion_matrix(cfm2, 
+                      target_col = "Var2", 
+                      prediction_col = "Var1", 
+                      counts_col = "Freq")
 ```
 
 ```{r}
@@ -309,7 +332,7 @@ df2 <- df %>%
 ```{r}
 podzial2 <- createDataPartition(y = df2$Result, 
                                 times = 1, 
-                                p = 0.7, 
+                                p = 0.8, 
                                 list = F)
 
 train2 <- df2[podzial2, ]
@@ -332,6 +355,12 @@ model_test2 <- model_test2 %>%
 tab3 <- table(test2$Result, model_test2$Result)
 tab3 <- as.matrix(tab3)
 tree_acc2 <- sum(diag(tab3))/sum(tab3)
+
+cfm3 <- as.data.frame(tab3)
+plot_confusion_matrix(cfm3, 
+                      target_col = "Var2", 
+                      prediction_col = "Var1", 
+                      counts_col = "Freq")
 ```
 
 ##### Regresja logistyczna
@@ -346,6 +375,13 @@ pred <- rep(0, length(probs))
 pred[probs > .5] <- 1
 tab4 <- table(pred, test2$Result)
 log_acc2 <- sum(diag(tab4))/sum(tab4)
+
+cfm4 <- as.data.frame(tab4)
+plot_confusion_matrix(cfm4, 
+                      target_col = "Var2", 
+                      prediction_col = "pred", 
+                      counts_col = "Freq")
+
 #po co?
 # explainer2 <- explain(model3, data = test2[-7], y = test[7])
 # explainer2 %>% model_performance()
@@ -370,7 +406,7 @@ kable(dokladnosc)
 Porównanie modeli regresji logistycznej
 
 ```{r}
-modelsummary(list(model, model4))
+modelsummary(list("Model 1" = model, "Model 2" = model4), coef_omit = 2:9)
 ```
 
 #### Wnioski

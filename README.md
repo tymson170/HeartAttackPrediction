@@ -43,23 +43,23 @@
 
 -   [ ] spróbować standaryzacji zmiennych
 
--   [ ] nie ma brakow danych - dopisac na poczatku
+-   [x] nie ma brakow danych - dopisac na poczatku
 
 -   [ ] cechy jakosciowe - odzielic kolumny / mienic funkcje
 
--   [ ] opis do piramidy wieku
+-   [x] opis do piramidy wieku
 
--   [ ] pod corrplotem spomniec o istotnej i niemalej korelacji cisnienia
+-   [x] pod corrplotem wspomniec o istotnej i niemalej korelacji cisnienia
 
 -   [ ] zmienic opis z model ze wsyzskimi na model z ckmb i troponin
 
 -   [ ] sprawdzic zatozenia GLM
 
--   [ ] 80% treningowy
+-   [x] 80% treningowy
 
--   [ ] confusion matrix - zrobic templatke
+-   [x] confusion matrix - zrobic templatke
 
--   [ ] poprawic porownanie modeli regresji logistycznych
+-   [x] poprawic porownanie modeli regresji logistycznych
 
 -   [ ] klastrowanie (sugestia prowadzącej)
 
