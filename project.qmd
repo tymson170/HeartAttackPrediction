@@ -72,9 +72,12 @@ library(rattle)
 library(apyramid)
 library(modelsummary)
 library(cvms)
+library(car)
 ```
 
 ```{r}
+set.seed(123)
+
 df <- read.arff("data/Medicaldataset.arff")
 df <- df %>% rename(
   "Age" = age,
@@ -247,8 +250,6 @@ Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać z
 
 ##### Model regresji logistycznej
 
-GLM założenia: - Homogeneity of variance - levene test - Normality of residuals - shapiro-wilk
-
 ```{r}
 sample <- sample(c(TRUE, FALSE), nrow(df), replace=TRUE, prob=c(0.7,0.3))
 test   <- df[!sample, ]
@@ -258,7 +259,50 @@ df  <- df[sample, ]
 model <- glm(Result~log(CK.MB)+log(Troponin), family = 'binomial', data = df)
 
 summary(model)
+```
 
+##### Testowanie założeń:
+
+1\) Zmienna objaśniająca przyjmuje dwie wartości (jest zmienną binarną)
+
+```{r}
+b <- as.data.frame(summary(df$Result))
+colnames(b) <- c("Result")
+kable(b)
+```
+
+Założenie jest spełnione, ponieważ zmienna `Result` przyjmuje tylko dwie wartości: 0 oraz 1.
+
+2\) Niezależność obserwacji
+
+Każda obserwacja odpowiada parametrom innego pacjenta, zatem założenie jest spełnione.
+
+3\) Brak współliniowości pomiędzy zmiennymi niezależnymi.
+
+```{r}
+mtest <- vif(model)
+kable(mtest)
+```
+
+Współczynniki testu na współliniowość są bliskie 1, więc nie mamy powodów do odrzucenia hipotezy o braku współliniowości.
+
+4\) Brak ekstremalnych wartości odstających.
+
+```{r}
+identify_outliers(log(df['CK.MB'])) %>% 
+  as.data.frame() %>% 
+  filter(is.extreme == TRUE) %>%
+  head() %>% 
+  kable()
+```
+
+Wartości zmiennej `CK.MB` mają wartości ekstremalne, pomimo to, zdecydujemy się zachować te obserwacje w zbiorze danych i zbudować na ich podstawie model.
+
+5\) Odpowiednio duża liczebność próby.
+
+Zbiór zawiera 927 obserwacji, co jest wystarczającą ilością do zbudowania na jego podstawie modelu.
+
+```{r}
 probs <- predict(model, newdata = test, type = "response")
 pred <- rep(0, length(probs))
 pred[probs > .5] <- 1
