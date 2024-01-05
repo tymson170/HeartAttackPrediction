@@ -249,8 +249,6 @@ Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać z
 
 GLM założenia: - Homogeneity of variance - levene test - Normality of residuals - shapiro-wilk
 
-
-
 ```{r}
 sample <- sample(c(TRUE, FALSE), nrow(df), replace=TRUE, prob=c(0.7,0.3))
 test   <- df[!sample, ]
@@ -451,4 +449,4 @@ Wizualizacja danych pozwoliła nam zauważyć błędy w danych, po pozbyciu się
 
 ## Podsumowanie
 
-...
+Dzięki temu projektowi wykorzystaliśmy zdobyte na studiach wiadomości i umiejętności z zakresu analizy danych na prawdziwym zbiorze danych. Dokonaliśmy szczegółowej wizualizacji danych, dzięki której lepiej poznaliśmy nasze dane. Udało nam się także stworzyć model decyzyjny, który osiągnął wysoką skuteczność.
