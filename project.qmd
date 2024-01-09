@@ -216,7 +216,7 @@ df %>% filter(Result == 0) %>%
   chart.Correlation()
 ```
 
-Powyższe wykresy są bardzo do siebie podobne. Jedyną wyraźną cechą różniącą je jest cecha CK.MB, która dla zdrowych pacjentów jest w zakresie 0-7, a dla osób z zawałem serca od 0-300. Warto również zwrócić uwagę na to, że stosunkowo silna korelacja występuje jedynie pomiędzy zmienną przechowującą ciśnienie nadkurczowe oraz rozkurczowe, co ma sens, ponieważ w praktyce miary te również są ze sobą powiązane. Wyklucza to jednak możliwość użycia obydwu zmiennych w przyszłych modelach.
+Powyższe wykresy są bardzo do siebie podobne. Jedyną wyraźną cechą różniącą je jest cecha CK.MB, która dla zdrowych pacjentów jest w zakresie 0-7, a dla osób z zawałem serca od 0-300. Warto również zwrócić uwagę na to, że stosunkowo silna korelacja występuje jedynie pomiędzy zmienną przechowującą ciśnienie skurczowe oraz rozkurczowe, co ma sens, ponieważ w praktyce miary te również są ze sobą powiązane. Wyklucza to jednak możliwość użycia obydwu zmiennych w przyszłych modelach.
 
 #### Histogram dla każdej cechy, z wizualnym podziałem na wynik
 
@@ -244,7 +244,13 @@ Na powyższym wykresie zależności CK.MB od Troponiny widać wyraźną granicę
 
 ### Wybór modelu
 
-Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać ze sobą 3 modele: - drzewo decyzyjne z wszystkimi parametrami, - drzewo decyzyjne z parametrami dobranymi przez nas, - las losowy z parametrami dobranymi przez nas.
+Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać ze sobą 3 modele: 
+
+- drzewo decyzyjne z wszystkimi parametrami, 
+
+- drzewo decyzyjne z parametrami dobranymi przez nas, 
+
+- las losowy z parametrami dobranymi przez nas.
 
 #### Modele z wszystkimi zmiennymi
 
@@ -317,11 +323,13 @@ plot_confusion_matrix(cfm1,
 log_acc1 <- sum(diag(table1))/sum(table1)
 ```
 
+Ten model ma dokładność na poziomie `r round(log_acc1*100, 2)`%.
+
 ##### Model drzewa decyzyjnego
 
 ##### Użycie cross validation do trenowania modelu
 
-Podział zbioru danych (80% dane treningowe i 10% dane testowe)
+Podział zbioru danych (80% dane treningowe i 20% dane testowe)
 
 ```{r}
 podzial <- createDataPartition(y = df$Result, 
@@ -332,18 +340,20 @@ train <- df[podzial, ]
 test <- df[-podzial, ]
 ```
 
-Trenowanie modelu z użyciem cross validation
 
 ```{r}
+# Trenowanie modelu z użyciem cross validation
+
 model2 <- caret::train(x= train[-9], 
                       y=train[,9], 
                       method = 'rpart', 
                       trControl = trainControl(method = 'cv', number=5))
 ```
 
-Testowanie modelu i wyświetlenie tabeli pomyłek
 
 ```{r}
+# Testowanie modelu i wyświetlenie tabeli pomyłek
+
 model_test <- predict(model2, test)
 model_test <- as.data.frame(model_test)
 
@@ -356,7 +366,9 @@ plot_confusion_matrix(cfm2,
                       target_col = "Var2", 
                       prediction_col = "Var1", 
                       counts_col = "Freq")
+log_acc2 <- sum(diag(table2))/sum(table2)
 ```
+Ten model ma dokładność na poziomie `r round(log_acc2*100, 2)`%.
 
 ```{r}
 fancyRpartPlot(model2$finalModel, caption='')
@@ -403,7 +415,9 @@ plot_confusion_matrix(cfm3,
                       target_col = "Var2", 
                       prediction_col = "Var1", 
                       counts_col = "Freq")
+log_acc3 <- sum(diag(tab3))/sum(tab3)
 ```
+Ten model ma dokładność na poziomie `r round(log_acc3*100, 2)`%.
 
 ##### Regresja logistyczna
 
@@ -424,12 +438,10 @@ plot_confusion_matrix(cfm4,
                       prediction_col = "pred", 
                       counts_col = "Freq")
 
-#po co?
-# explainer2 <- explain(model3, data = test2[-7], y = test[7])
-# explainer2 %>% model_performance()
-# 
-# explainer2 %>% feature_importance() %>% plot()
+log_acc4 <- sum(diag(tab4))/sum(tab4)
 ```
+Ten model ma dokładność na poziomie `r round(log_acc4*100, 2)`%.
+
 
 W modelu regresji logistycznej tylko dwie zmienne są statystycznie istotne (age i gender), ale nie są one wytłumaczyć czy ktoś ma zawał serca tak dobrze jak w modelu drzewa decyzyjnego.
 
@@ -448,7 +460,7 @@ kable(dokladnosc)
 Porównanie modeli regresji logistycznej
 
 ```{r}
-modelsummary(list("Model 1" = model, "Model 2" = model4), coef_omit = 2:9)
+modelsummary(list("Model z wszyskimi cechami" = model, "Model bez CK.MB i troponiny" = model4), coef_omit = 2:9)
 ```
 
 #### Wnioski
@@ -465,15 +477,15 @@ Drzewo decyzyjne używając tych dwóch zmiennych jest w stanie bardzo dobrze pr
 ggplotly(p)
 ```
 
-Modele stworzone bez zmiennych CK.MB i Troponiny mają o wiele gorszą dokładność. Jedyna zmienna, która w istotny sposób wpływa na wynik jest wiek, ale nie jest ona w stanie przewidzieć czy pacjent ma zawał serca tak dobrze jak w modelu z zmiennymi CK.MB i Troponin.
+Modele stworzone bez zmiennych CK.MB i Troponiny mają o wiele gorszą dokładność. Jedyna zmienna, która w istotny sposób wpływa na wynik jest wiek, ale nie jest ona w stanie przewidzieć czy pacjent ma zawał serca tak dobrze jak w modelu ze zmiennymi CK.MB i Troponin.
 
 Być może gdybyśmy w dostępnych danych mieli takie wartości jak:
 
--   czy dana osoba pali tytoń,
+-   czy dana osoba pali papierosy,
 
 -   poziom cholesterolu,
 
--   marskość wątroby,
+-   czy dana osoba jest aktywna fizycznie,
 
 to moglibyśmy stworzyć lepszy model, który miałby większą dokładność.
 
@@ -481,15 +493,19 @@ to moglibyśmy stworzyć lepszy model, który miałby większą dokładność.
 
 1.  Opracowanie modelu predykcyjnego, który na podstawie danych o pacjencie, przewiduje czy miał on zawał serca.
 
-Udało nam się stworzyć model i uzyskać wysoką dokładność. Jednak przy większej i lepszej jakości danych, model mógłby być jeszcze lepszy.
+    Udało nam się stworzyć model i uzyskać wysoką dokładność. Jednak przy większej i lepszej jakości danych, model mógłby być jeszcze lepszy.
 
 2.  Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
 
-Lekarze stwierdzając świeży zawał mięśnia sercowego, stosują wartość odcięcia (czyli wartość powyżej 99 centyla zakresu referencyjnego). Dla troponiny ta wartość wacha się od $0,01 \mu g/l$ do $0,08 \mu g/l$ w zależności od producenta testu.[@jaffe2006] W naszym modelu wartość, od której decydujemy czy ktoś ma zawał dla troponiny wynosi $0,015$, a dla CK.MB $6,3$.
+    Lekarze stwierdzając świeży zawał mięśnia sercowego, stosują wartość odcięcia (czyli wartość powyżej 99 centyla zakresu referencyjnego). Dla CK.MB wynosi ona około $5.5 ng/ml$ ,a dla troponiny wartość odcięcia wacha się od $0.01 \mu g/l$ do $0.08 \mu g/l$ w zależności od producenta testu.[@jaffe2006] 
+    
+    W naszym modelu wartość, od której decydujemy czy ktoś ma zawał dla troponiny wynosi $0.015 \mu g/l$, a dla CK.MB $6.3 ng/ml$.
+    
+    Zatem wartość troponiny w naszym modelu mieści się w dolnej granicy wartości referencyjnych stosowanych przez lekarzy. Natomiast model wymaga nieco większej wartości enzymu kineazy kreatynowej do stwierdzenia zawału serca niż sugerują to wartości referencyjne.
 
 3.  Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
 
-Wizualizacja danych pozwoliła nam zauważyć błędy w danych, po pozbyciu się których, otrzymaliśmy lepsze jakosciowo dane. Dostrzegliśmy także zmienne, które mogły mieć dużą moc predykcyjną w stworzonym później modelu. Dowiedzieliśmy się także, że najwięszą grupą w zbiorze są mężczyźni z zawałem serca, a najmniej liczna jest grupa kobiet bez zawału serca.
+    Wizualizacja danych pozwoliła nam zauważyć błędy w danych, po pozbyciu się których, otrzymaliśmy lepsze jakościowo dane. Dostrzegliśmy także zmienne, które mogły mieć dużą moc predykcyjną w stworzonym później modelu. Dowiedzieliśmy się także, że największą grupą w zbiorze są mężczyźni z zawałem serca, a najmniej liczna jest grupa kobiet bez zawału serca.
 
 ## Podsumowanie
 
