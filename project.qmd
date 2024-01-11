@@ -15,6 +15,7 @@ execute:
 editor_options: 
   chunk_output_type: console
 bibliography: references.bib
+
 ---
 
 ## Źródło danych
@@ -443,7 +444,7 @@ log_acc4 <- sum(diag(tab4))/sum(tab4)
 Ten model ma dokładność na poziomie `r round(log_acc4*100, 2)`%.
 
 
-W modelu regresji logistycznej tylko dwie zmienne są statystycznie istotne (age i gender), ale nie są one wytłumaczyć czy ktoś ma zawał serca tak dobrze jak w modelu drzewa decyzyjnego.
+W modelu regresji logistycznej tylko jedna zmienna jest statystycznie istotne (age) i oczywiście nie jest ona wytłumaczyć czy ktoś ma zawał serca tak dobrze jak w modelu drzewa decyzyjnego.
 
 ### Podsumowanie efektywności modelu / jego przydatności
 
