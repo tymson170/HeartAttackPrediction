@@ -15,7 +15,6 @@ execute:
 editor_options: 
   chunk_output_type: console
 bibliography: references.bib
-
 ---
 
 ## Źródło danych
@@ -74,6 +73,7 @@ library(apyramid)
 library(modelsummary)
 library(cvms)
 library(car)
+library(gridExtra)
 ```
 
 ```{r}
@@ -245,15 +245,15 @@ Na powyższym wykresie zależności CK.MB od Troponiny widać wyraźną granicę
 
 ### Wybór modelu
 
-Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać ze sobą 3 modele: 
+Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać ze sobą 3 modele:
 
-- drzewo decyzyjne z wszystkimi parametrami, 
+-   drzewo decyzyjne z wszystkimi parametrami,
 
-- drzewo decyzyjne z parametrami dobranymi przez nas, 
+-   drzewo decyzyjne z parametrami dobranymi przez nas,
 
-- las losowy z parametrami dobranymi przez nas.
+-   las losowy z parametrami dobranymi przez nas.
 
-#### Modele z wszystkimi zmiennymi
+#### Modele z `CK.MB` i `Troponin`
 
 ##### Model regresji logistycznej
 
@@ -263,6 +263,18 @@ test   <- df[!sample, ]
 df  <- df[sample, ]
 
 
+modelbezlog <- glm(Result~CK.MB+Troponin, family = 'binomial', data = df)
+
+summary(modelbezlog)
+```
+
+```{r}
+p1 <- ggplot(df, aes(x = CK.MB, y = Troponin)) + geom_point() + ggtitle("Zmienne przed transformacją")
+p2 <- ggplot(df, aes(x = log(CK.MB), y = log(Troponin))) + geom_point() + ggtitle("Zmienne po transformacji")
+grid.arrange(p1, p2, ncol = 2)
+```
+
+```{r}
 model <- glm(Result~log(CK.MB)+log(Troponin), family = 'binomial', data = df)
 
 summary(model)
@@ -341,7 +353,6 @@ train <- df[podzial, ]
 test <- df[-podzial, ]
 ```
 
-
 ```{r}
 # Trenowanie modelu z użyciem cross validation
 
@@ -350,7 +361,6 @@ model2 <- caret::train(x= train[-9],
                       method = 'rpart', 
                       trControl = trainControl(method = 'cv', number=5))
 ```
-
 
 ```{r}
 # Testowanie modelu i wyświetlenie tabeli pomyłek
@@ -369,6 +379,7 @@ plot_confusion_matrix(cfm2,
                       counts_col = "Freq")
 log_acc2 <- sum(diag(table2))/sum(table2)
 ```
+
 Ten model ma dokładność na poziomie `r round(log_acc2*100, 2)`%.
 
 ```{r}
@@ -418,6 +429,7 @@ plot_confusion_matrix(cfm3,
                       counts_col = "Freq")
 log_acc3 <- sum(diag(tab3))/sum(tab3)
 ```
+
 Ten model ma dokładność na poziomie `r round(log_acc3*100, 2)`%.
 
 ##### Regresja logistyczna
@@ -441,8 +453,8 @@ plot_confusion_matrix(cfm4,
 
 log_acc4 <- sum(diag(tab4))/sum(tab4)
 ```
-Ten model ma dokładność na poziomie `r round(log_acc4*100, 2)`%.
 
+Ten model ma dokładność na poziomie `r round(log_acc4*100, 2)`%.
 
 W modelu regresji logistycznej tylko jedna zmienna jest statystycznie istotne (age) i oczywiście nie jest ona wytłumaczyć czy ktoś ma zawał serca tak dobrze jak w modelu drzewa decyzyjnego.
 
@@ -461,7 +473,7 @@ kable(dokladnosc)
 Porównanie modeli regresji logistycznej
 
 ```{r}
-modelsummary(list("Model z wszyskimi cechami" = model, "Model bez CK.MB i troponiny" = model4), coef_omit = 2:9)
+modelsummary(list("Model z CK.MB i Troponiną (po transformacji)" = model, "Model z CK.MB i Troponiną (przed transformacją)" = modelbezlog, "Model złożony z pozostałych zmiennych" = model4), coef_omit = 2:11)
 ```
 
 #### Wnioski
@@ -498,10 +510,10 @@ to moglibyśmy stworzyć lepszy model, który miałby większą dokładność.
 
 2.  Porównanie wartości cech którymi kieruje się model (m.in. CKMB i Troponina) do wartości referencyjnych stosowanych przez lekarzy do wykrycia zawału.
 
-    Lekarze stwierdzając świeży zawał mięśnia sercowego, stosują wartość odcięcia (czyli wartość powyżej 99 centyla zakresu referencyjnego). Dla CK.MB wynosi ona około $5.5 ng/ml$ ,a dla troponiny wartość odcięcia wacha się od $0.01 \mu g/l$ do $0.08 \mu g/l$ w zależności od producenta testu.[@jaffe2006] 
-    
+    Lekarze stwierdzając świeży zawał mięśnia sercowego, stosują wartość odcięcia (czyli wartość powyżej 99 centyla zakresu referencyjnego). Dla CK.MB wynosi ona około $5.5 ng/ml$ ,a dla troponiny wartość odcięcia wacha się od $0.01 \mu g/l$ do $0.08 \mu g/l$ w zależności od producenta testu.[@jaffe2006]
+
     W naszym modelu wartość, od której decydujemy czy ktoś ma zawał dla troponiny wynosi $0.015 \mu g/l$, a dla CK.MB $6.3 ng/ml$.
-    
+
     Zatem wartość troponiny w naszym modelu mieści się w dolnej granicy wartości referencyjnych stosowanych przez lekarzy. Natomiast model wymaga nieco większej wartości enzymu kineazy kreatynowej do stwierdzenia zawału serca niż sugerują to wartości referencyjne.
 
 3.  Używając technik wizualizacji danych wykryć wzorce i nietypowe zachowania w zbiorze danych, a także lepiej zrozumieć rozkłady poszczególnych zmiennych.
