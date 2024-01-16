@@ -12,6 +12,7 @@ editor: visual
 embed-resources: true
 execute: 
   warning: false
+  echo: true 
 editor_options: 
   chunk_output_type: console
 bibliography: references.bib
@@ -247,11 +248,13 @@ Na powyższym wykresie zależności CK.MB od Troponiny widać wyraźną granicę
 
 Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać ze sobą 3 modele:
 
--   drzewo decyzyjne z wszystkimi parametrami,
+- drzewo decyzyjne dla wszystkich zmiennych,
 
--   drzewo decyzyjne z parametrami dobranymi przez nas,
+- drzewo decyzyjne bez CK.MB oraz Troponiny,
 
--   las losowy z parametrami dobranymi przez nas.
+- regresja logistyczna dla CK.MB i Troponiny,
+
+- regresja logistyczna dla reszty zmiennych
 
 #### Modele z `CK.MB` i `Troponin`
 
