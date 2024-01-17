@@ -28,7 +28,7 @@ Wiek, płeć, tętno, skurczowe ciśnienie tętnicze, rozkurczowe ciśnienie tę
 ### Przedstawienie zmiennych
 
 | Cecha                    | Opis                                                                                                           |
-|---------------------------|---------------------------------------------|
+|-------------------|-----------------------------------------------------|
 | Age                      | Wiek pacjenta w latach                                                                                         |
 | Gender                   | Płeć pacjenta (0 - kobieta, 1 - mężczyzna)                                                                     |
 | Heart Rate               | Maksymalne osiągnięte tętno (za prawidłowe tętno uznaje się przedział od 60 do 100 uderzeń serca na minutę)    |
@@ -234,7 +234,7 @@ df %>%
 ### Wykres zależności CK.MB od Troponiny z podziałem na pacjentów z zawałem i bez
 
 ```{r echo=FALSE}
-p <- ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point(alpha = 0.5) + scale_color_manual(values = c("1" = "red", "0" = "blue")) + labs(x = "CK.MB", y = "Troponina (skala logarytmiczna)", col = "Wynik") + theme_minimal() + scale_y_log10() + scale_x_log10()
+p <- ggplot(df, aes(x = CK.MB, y = Troponin, col = factor(Result))) + geom_point(alpha = 0.5) + scale_color_manual(values = c("1" = "red", "0" = "blue")) + labs(x = "CK.MB (skala logarytmiczna)", y = "Troponina (skala logarytmiczna)", col = "Wynik") + theme_minimal() + scale_y_log10() + scale_x_log10()
 
 ggplotly(p)
 ```
@@ -257,13 +257,19 @@ Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać z
 
 ##### Model regresji logistycznej
 
+Podział zbioru danych (80% dane treningowe i 20% dane testowe)
+
 ```{r}
-sample <- sample(c(TRUE, FALSE), nrow(df), replace=TRUE, prob=c(0.7,0.3))
-test   <- df[!sample, ]
-df  <- df[sample, ]
+podzial <- createDataPartition(y = df$Result, 
+                               times = 1, 
+                               p = 0.8, 
+                               list = F)
+train <- df[podzial, ]
+test <- df[-podzial, ]
+```
 
-
-modelbezlog <- glm(Result~CK.MB+Troponin, family = 'binomial', data = df)
+```{r}
+modelbezlog <- glm(Result~CK.MB+Troponin, family = 'binomial', data = train)
 
 summary(modelbezlog)
 ```
@@ -275,7 +281,7 @@ grid.arrange(p1, p2, ncol = 2)
 ```
 
 ```{r}
-model <- glm(Result~log(CK.MB)+log(Troponin), family = 'binomial', data = df)
+model <- glm(Result~log(CK.MB)+log(Troponin), family = 'binomial', data = train)
 
 summary(model)
 ```
@@ -285,7 +291,7 @@ summary(model)
 1\) Zmienna objaśniająca przyjmuje dwie wartości (jest zmienną binarną)
 
 ```{r}
-b <- as.data.frame(summary(df$Result))
+b <- as.data.frame(summary(train$Result))
 colnames(b) <- c("Result")
 kable(b)
 ```
@@ -308,7 +314,7 @@ Współczynniki testu na współliniowość są bliskie 1, więc nie mamy powod�
 4\) Brak ekstremalnych wartości odstających.
 
 ```{r}
-identify_outliers(log(df['CK.MB'])) %>% 
+identify_outliers(log(train['CK.MB'])) %>% 
   as.data.frame() %>% 
   filter(is.extreme == TRUE) %>%
   head() %>% 
@@ -319,17 +325,17 @@ Wartości zmiennej `CK.MB` mają wartości ekstremalne, pomimo to, zdecydujemy s
 
 5\) Odpowiednio duża liczebność próby.
 
-Zbiór zawiera 927 obserwacji, co jest wystarczającą ilością do zbudowania na jego podstawie modelu.
+Zbiór treningowy zawiera 744 obserwacje, co jest wystarczającą ilością do zbudowania na jego podstawie modelu.
 
 ```{r}
 probs <- predict(model, newdata = test, type = "response")
 pred <- rep(0, length(probs))
 pred[probs > .5] <- 1
-table1 <- table(pred, test$Result)
+table1 <- table(test$Result, pred)
 
 cfm1 <- as.data.frame(table1)
 plot_confusion_matrix(cfm1, 
-                      target_col = "Var2", 
+                      target_col = "Var1", 
                       prediction_col = "pred", 
                       counts_col = "Freq")
 
@@ -341,17 +347,6 @@ Ten model ma dokładność na poziomie `r round(log_acc1*100, 2)`%.
 ##### Model drzewa decyzyjnego
 
 ##### Użycie cross validation do trenowania modelu
-
-Podział zbioru danych (80% dane treningowe i 20% dane testowe)
-
-```{r}
-podzial <- createDataPartition(y = df$Result, 
-                               times = 1, 
-                               p = 0.8, 
-                               list = F)
-train <- df[podzial, ]
-test <- df[-podzial, ]
-```
 
 ```{r}
 # Trenowanie modelu z użyciem cross validation
