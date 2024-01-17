@@ -12,8 +12,9 @@ editor: visual
 embed-resources: true
 execute: 
   warning: false
+  echo: true 
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 bibliography: references.bib
 ---
 
@@ -122,6 +123,7 @@ df <- df[df$`Heart Rate` != 1111, ]
 ```
 
 Występują trzy obserwacje, w których tętno wynosi 1111. Normalne tętno wynosi maksymalnie 100 uderzeń serca na minutę więc są to nieprawidłowe dane, najprawdopodobniej spowodowane błędem przy wpisywaniu danych, które należy usunąć.
+
 
 ## Opis zbioru
 
@@ -247,11 +249,13 @@ Na powyższym wykresie zależności CK.MB od Troponiny widać wyraźną granicę
 
 Z racji tego, że nasz problem jest klasyfikacyjny, postanowiliśmy porównać ze sobą 3 modele:
 
--   drzewo decyzyjne z wszystkimi parametrami,
+- drzewo decyzyjne dla wszystkich zmiennych,
 
--   drzewo decyzyjne z parametrami dobranymi przez nas,
+- drzewo decyzyjne bez CK.MB oraz Troponiny,
 
--   las losowy z parametrami dobranymi przez nas.
+- regresja logistyczna dla CK.MB i Troponiny,
+
+- regresja logistyczna dla reszty zmiennych
 
 #### Modele z `CK.MB` i `Troponin`
 
@@ -314,10 +318,10 @@ Współczynniki testu na współliniowość są bliskie 1, więc nie mamy powod�
 4\) Brak ekstremalnych wartości odstających.
 
 ```{r}
-identify_outliers(log(train['CK.MB'])) %>% 
+identify_outliers((train['CK.MB'])) %>% 
   as.data.frame() %>% 
   filter(is.extreme == TRUE) %>%
-  head() %>% 
+  tail() %>% 
   kable()
 ```
 
